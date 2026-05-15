@@ -1,0 +1,19 @@
+{
+  "name": "Luis Portfolio Control",
+  "short_name": "Portfolio",
+  "description": "Dashboard financiero personal de cartera, opciones y objetivos.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
