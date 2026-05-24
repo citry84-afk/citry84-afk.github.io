@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Luis Portfolio Control - Opciones ajustadas</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <style>
+    :root{--bg:#07111f;--card:rgba(15,23,42,.82);--line:rgba(148,163,184,.20);--txt:#f8fafc;--muted:#94a3b8;--soft:#cbd5e1;--green:#34d399;--cyan:#22d3ee;--red:#fb7185;--amber:#fbbf24}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;color:var(--txt);background:radial-gradient(circle at 0 0,#173b85 0,#07111f 42%,#020617 100%)}
+    .wrap{width:min(1480px,calc(100% - 28px));margin:auto;padding:18px 0 0}.card{background:linear-gradient(145deg,var(--card),rgba(15,23,42,.55));border:1px solid var(--line);border-radius:22px;box-shadow:0 18px 60px rgba(0,0,0,.28);backdrop-filter:blur(18px)}
+    header{padding:18px 20px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;color:#7dd3fc;font-size:11px;font-weight:900}h1{font-size:clamp(31px,4vw,54px);line-height:.94;margin:7px 0;letter-spacing:-.06em}p{margin:0;color:var(--soft);font-size:14px;line-height:1.45}.status{display:flex;gap:10px;align-items:center;padding:10px 13px;border-radius:15px;background:rgba(16,185,129,.12);border:1px solid rgba(52,211,153,.28);white-space:nowrap}.dot{width:11px;height:11px;border-radius:50%;background:var(--green);box-shadow:0 0 0 6px rgba(52,211,153,.12)}.status span{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+    .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:13px 0}.kpi{padding:16px;min-height:112px}.kpi.main{border-color:rgba(251,191,36,.45);background:linear-gradient(145deg,rgba(251,191,36,.18),rgba(15,23,42,.58))}.kpi.good{border-color:rgba(52,211,153,.40);background:linear-gradient(145deg,rgba(52,211,153,.18),rgba(15,23,42,.58))}.label{color:var(--muted);font-size:12px;font-weight:800}.value{font-size:clamp(24px,2.55vw,36px);font-weight:900;letter-spacing:-.055em;margin:8px 0 5px}.sub{color:var(--soft);font-size:12px;line-height:1.35}.red{color:var(--red)}.green{color:var(--green)}
+    .explainer{padding:16px;margin-bottom:13px;display:grid;grid-template-columns:1.1fr .9fr;gap:14px;align-items:center}.formula{padding:14px;border-radius:16px;border:1px solid rgba(125,211,252,.22);background:rgba(2,6,23,.38);font-weight:800;color:#e0f2fe}.formula b{color:white}.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.chip{border:1px solid var(--line);background:rgba(148,163,184,.10);border-radius:999px;padding:7px 10px;color:var(--soft);font-size:12px;font-weight:800}.chip.good{border-color:rgba(52,211,153,.30);color:#bbf7d0;background:rgba(34,197,94,.12)}.chip.warn{border-color:rgba(251,191,36,.32);color:#fef3c7;background:rgba(251,191,36,.12)}
+    iframe{display:block;width:100%;height:2100px;border:0;margin-top:13px;border-radius:22px;background:#07111f}.note{color:var(--muted);font-size:12px;margin:0 0 14px;text-align:center}.privacy-on .sensitive{filter:blur(9px)}button{border:1px solid rgba(125,211,252,.30);background:rgba(15,23,42,.62);color:#e2e8f0;padding:10px 13px;border-radius:14px;font-weight:900;font-size:13px;cursor:pointer}
+    @media(max-width:1100px){header,.explainer{grid-template-columns:1fr;flex-direction:column}.kpis{grid-template-columns:1fr 1fr}.status{white-space:normal}iframe{height:2600px}}@media(max-width:560px){.wrap{width:min(100% - 18px,1480px);padding-top:12px}.kpis{grid-template-columns:1fr}.kpi{min-height:92px}.explainer{padding:14px}iframe{height:3000px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="card">
+      <div>
+        <div class="eyebrow">Dashboard financiero personal</div>
+        <h1>Luis Portfolio Control</h1>
+        <p>He añadido la métrica que mide mejor si la estrategia de venta de PUTs funciona de verdad: primas realizadas menos pérdidas realizadas de acciones asignadas y vendidas.</p>
+      </div>
+      <div class="status"><i class="dot"></i><div><b>Sistema sano</b><span>Semana 21 · 22/05/2026</span></div></div>
+    </header>
+
+    <section class="kpis sensitive">
+      <article class="card kpi good"><div class="label">Opciones YTD</div><div class="value">16.244 €</div><div class="sub">Primas / resultado realizado de opciones</div></article>
+      <article class="card kpi"><div class="label">Ajuste asignaciones</div><div class="value red">-5.643 €</div><div class="sub">VTGN + RPD + RGTI cerradas con pérdida</div></article>
+      <article class="card kpi main"><div class="label">Opciones ajustadas</div><div class="value">10.601 €</div><div class="sub">Resultado real de la estrategia</div></article>
+      <article class="card kpi"><div class="label">Ritmo ajustado</div><div class="value">2.187 €/mes</div><div class="sub">Anualizado por 21 semanas</div></article>
+      <article class="card kpi"><div class="label">Valor cartera</div><div class="value">77.184 €</div><div class="sub">Último pantallazo operativo</div></article>
+      <article class="card kpi"><div class="label">Fondos disponibles</div><div class="value">48,6%</div><div class="sub">Colchón sobre cartera</div></article>
+    </section>
+
+    <section class="card explainer sensitive">
+      <div>
+        <div class="eyebrow">Nueva lectura principal</div>
+        <h2>Opciones ajustadas = el marcador honesto</h2>
+        <p>Las primas de opciones dicen cuánto genera la máquina, pero las opciones ajustadas descuentan las pérdidas ya realizadas cuando una PUT acaba en asignación y las acciones se venden con pérdida. Por eso esta será la métrica principal de largo plazo.</p>
+        <div class="chips">
+          <span class="chip good">Primas: +16.243,64 €</span>
+          <span class="chip warn">Ajuste: -5.642,81 €</span>
+          <span class="chip good">Ajustado: 10.600,83 €</span>
+        </div>
+      </div>
+      <div class="formula">
+        <b>10.600,83 €</b><br>
+        = 16.243,64 € - 5.642,81 €<br><br>
+        <span style="color:#94a3b8">Criterio: solo descuento asignaciones cerradas con pérdida. Las asignaciones abiertas, como NVO, se vigilan aparte pero no se restan hasta vender.</span>
+      </div>
+    </section>
+
+    <p class="note">Debajo se mantiene el dashboard completo con las gráficas e histórico. En la próxima iteración integro esta métrica dentro de las tarjetas y objetivos internos del dashboard completo.</p>
+    <iframe src="/dashboard-2026-05-21/" title="Dashboard completo"></iframe>
+  </main>
+</body>
+</html>
