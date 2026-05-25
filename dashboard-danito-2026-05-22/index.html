@@ -13,7 +13,7 @@
     header{padding:20px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;color:#7dd3fc;font-size:11px;font-weight:900}h1{font-size:clamp(32px,4.2vw,58px);line-height:.92;letter-spacing:-.06em;margin:7px 0}h2{font-size:21px;margin:4px 0 0;letter-spacing:-.03em}p{margin:0;color:var(--soft);font-size:14px;line-height:1.45}.status{display:flex;gap:10px;align-items:center;padding:10px 13px;border-radius:15px;background:rgba(16,185,129,.11);border:1px solid rgba(52,211,153,.28);white-space:nowrap}.dot{width:11px;height:11px;border-radius:50%;background:var(--green);box-shadow:0 0 0 6px rgba(52,211,153,.12)}.status span{display:block;color:var(--muted);font-size:12px;margin-top:2px}
     .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:13px 0}.kpi{padding:16px;min-height:112px}.kpi.main{border-color:rgba(251,191,36,.45);background:linear-gradient(145deg,rgba(251,191,36,.19),rgba(15,23,42,.58))}.kpi.good{border-color:rgba(52,211,153,.40);background:linear-gradient(145deg,rgba(52,211,153,.18),rgba(15,23,42,.58))}.kpi.warn{border-color:rgba(251,113,133,.36);background:linear-gradient(145deg,rgba(251,113,133,.13),rgba(15,23,42,.58))}.label{color:var(--muted);font-size:12px;font-weight:800}.value{font-size:clamp(23px,2.55vw,36px);font-weight:900;letter-spacing:-.055em;margin:8px 0 5px}.sub{color:var(--soft);font-size:12px;line-height:1.35}.green{color:var(--green)}.red{color:var(--red)}.amber{color:var(--amber)}
     .grid{display:grid;gap:13px;margin-top:13px}.two{grid-template-columns:1fr 1fr}.wide{grid-template-columns:2fr 1fr}.panel{padding:16px}.note{padding:13px;border-radius:16px;border:1px solid rgba(125,211,252,.22);background:linear-gradient(145deg,rgba(14,165,233,.13),rgba(16,185,129,.09));color:#e0f2fe;font-size:13px;line-height:1.45;margin-top:12px}.formula{padding:16px;border-radius:18px;border:1px solid rgba(251,191,36,.26);background:linear-gradient(145deg,rgba(251,191,36,.12),rgba(2,6,23,.38));font-size:15px;line-height:1.55}.formula b{font-size:26px;letter-spacing:-.05em}.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.chip{border:1px solid var(--line);background:rgba(148,163,184,.10);border-radius:999px;padding:7px 10px;color:var(--soft);font-size:12px;font-weight:800}.chip.good{border-color:rgba(52,211,153,.30);color:#bbf7d0;background:rgba(34,197,94,.12)}.chip.warn{border-color:rgba(251,191,36,.32);color:#fef3c7;background:rgba(251,191,36,.12)}.chip.bad{border-color:rgba(251,113,133,.32);color:#fecdd3;background:rgba(251,113,133,.12)}
-    .bars{display:flex;flex-direction:column;gap:11px;margin-top:12px}.barRow{display:grid;grid-template-columns:215px 1fr 125px;align-items:center;gap:10px}.track{height:12px;background:rgba(148,163,184,.18);border-radius:999px;overflow:hidden}.track i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan))}.track.red i{background:linear-gradient(90deg,var(--red),#f97316)}.track.amber i{background:linear-gradient(90deg,var(--amber),#22d3ee)}.track.violet i{background:linear-gradient(90deg,var(--violet),var(--cyan))}
+    .bars{display:flex;flex-direction:column;gap:11px;margin-top:12px}.barRow{display:grid;grid-template-columns:235px 1fr 130px;align-items:center;gap:10px}.track{height:12px;background:rgba(148,163,184,.18);border-radius:999px;overflow:hidden}.track i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan))}.track.red i{background:linear-gradient(90deg,var(--red),#f97316)}.track.amber i{background:linear-gradient(90deg,var(--amber),#22d3ee)}.track.violet i{background:linear-gradient(90deg,var(--violet),var(--cyan))}
     .table{width:100%;border-collapse:separate;border-spacing:0 8px;margin-top:10px}.table th{text-align:left;color:var(--muted);font-size:12px}.table td{padding:10px 11px;background:rgba(2,6,23,.34);border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:13px}.table td:first-child{border-left:1px solid var(--line);border-radius:12px 0 0 12px;font-weight:800}.table td:last-child{border-right:1px solid var(--line);border-radius:0 12px 12px 0;text-align:right;font-weight:900}
     .waterfall{height:260px;display:flex;align-items:flex-end;gap:14px;padding:18px 12px 26px}.col{flex:1;border-radius:14px 14px 5px 5px;background:linear-gradient(180deg,var(--green),var(--cyan));min-height:10px;position:relative}.col.neg{background:linear-gradient(180deg,var(--red),#fb923c)}.col.gold{background:linear-gradient(180deg,var(--amber),#22d3ee)}.col.violet{background:linear-gradient(180deg,var(--violet),#38bdf8)}.col span{position:absolute;left:50%;bottom:calc(100% + 7px);transform:translateX(-50%);font-size:12px;font-weight:900;white-space:nowrap}.col small{position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);font-size:11px;color:var(--muted);white-space:nowrap;text-align:center}.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:15px}
     @media(max-width:1150px){header{flex-direction:column}.kpis{grid-template-columns:1fr 1fr}.two,.wide{grid-template-columns:1fr}.barRow{grid-template-columns:1fr}.status{white-space:normal}.waterfall{height:240px;gap:8px}.col span{font-size:10.5px}.col small{font-size:10px}}
@@ -23,41 +23,41 @@
 <body>
   <main class="wrap">
     <header class="card">
-      <div><div class="eyebrow">Dashboard financiero personal</div><h1>Danito Options Control</h1><p>Versión focalizada en opciones: resultado realizado, opciones abiertas, medias semanales/mensuales, YTD total y peso real de las opciones en el beneficio.</p></div>
-      <div class="status"><i class="dot"></i><div><b>Snapshot inicial</b><span>22/05/2026 · PDF YTD</span></div></div>
+      <div><div class="eyebrow">Dashboard financiero personal</div><h1>Danito Options Control</h1><p>Versión focalizada en opciones: resultado realizado, opciones abiertas, medias semanales/mensuales, YTD total, peso de opciones y liquidez disponible.</p></div>
+      <div class="status"><i class="dot"></i><div><b>Snapshot actualizado</b><span>Captura IBKR + PDF YTD</span></div></div>
     </header>
 
     <section class="kpis">
-      <article class="card kpi main"><div class="label">Opciones totales</div><div class="value">117.001 €</div><div class="sub">Realizado + abierto</div></article>
+      <article class="card kpi main"><div class="label">Valor cartera actual</div><div class="value">641.970 €</div><div class="sub">Valor liquidativo neto</div></article>
+      <article class="card kpi good"><div class="label">Fondos disponibles / cartera</div><div class="value">40,1%</div><div class="sub">257.274 € / 641.970 €</div></article>
+      <article class="card kpi good"><div class="label">Opciones realizadas / cartera</div><div class="value">11,4%</div><div class="sub">73.141 € / 641.970 €</div></article>
+      <article class="card kpi main"><div class="label">Opciones totales / cartera</div><div class="value">18,2%</div><div class="sub">Realizado + abierto</div></article>
       <article class="card kpi good"><div class="label">Opciones realizadas</div><div class="value">73.141 €</div><div class="sub">Cerradas YTD</div></article>
+      <article class="card kpi good"><div class="label">Opciones abiertas</div><div class="value">43.860 €</div><div class="sub">PyG no realizada actual</div></article>
       <article class="card kpi main"><div class="label">Opciones ajustadas</div><div class="value">47.073 €</div><div class="sub">Realizado neto realista</div></article>
-      <article class="card kpi good"><div class="label">Ajustadas + abiertas</div><div class="value">90.933 €</div><div class="sub">Foto neta actual</div></article>
+      <article class="card kpi good"><div class="label">Ajustadas + abiertas</div><div class="value">90.933 €</div><div class="sub">14,2% de la cartera</div></article>
       <article class="card kpi"><div class="label">Media opciones/semana</div><div class="value">3.483 €</div><div class="sub">Realizadas / 21 semanas</div></article>
       <article class="card kpi"><div class="label">Media opciones/mes</div><div class="value">15.093 €</div><div class="sub">Ritmo mensual realizado</div></article>
-      <article class="card kpi"><div class="label">Media ajustada/semana</div><div class="value">2.242 €</div><div class="sub">Ajustadas / 21 semanas</div></article>
-      <article class="card kpi"><div class="label">Media ajustada/mes</div><div class="value">9.714 €</div><div class="sub">Ritmo mensual ajustado</div></article>
       <article class="card kpi warn"><div class="label">YTD total</div><div class="value red">-0,21%</div><div class="sub">TWR de la cuenta</div></article>
       <article class="card kpi"><div class="label">Beneficio por opciones</div><div class="value">78,1%</div><div class="sub">Opciones totales / PyG total</div></article>
-      <article class="card kpi"><div class="label">Beneficio ajustado por opciones</div><div class="value">60,7%</div><div class="sub">Ajustadas + abiertas / PyG total</div></article>
-      <article class="card kpi"><div class="label">Fondos disponibles</div><div class="value">17,3%</div><div class="sub">Efectivo / NAV total</div></article>
     </section>
 
     <section class="grid two">
       <article class="card panel">
+        <div class="eyebrow">Liquidez y tamaño relativo</div><h2>Los dos ratios que pedías</h2>
+        <div class="bars">
+          <div class="barRow"><span>Fondos disponibles / cartera</span><div class="track"><i style="width:40.1%"></i></div><b>40,1%</b></div>
+          <div class="barRow"><span>Opciones realizadas / cartera</span><div class="track amber"><i style="width:11.4%"></i></div><b>11,4%</b></div>
+          <div class="barRow"><span>Opciones ajustadas / cartera</span><div class="track amber"><i style="width:7.3%"></i></div><b>7,3%</b></div>
+          <div class="barRow"><span>Opciones totales / cartera</span><div class="track violet"><i style="width:18.2%"></i></div><b>18,2%</b></div>
+          <div class="barRow"><span>Ajustadas + abiertas / cartera</span><div class="track violet"><i style="width:14.2%"></i></div><b>14,2%</b></div>
+        </div>
+        <div class="note"><b>Lectura:</b> Danito tiene un colchón de fondos muy alto, cerca del 40% de la cartera. Las opciones realizadas equivalen ya al 11,4% del valor total de la cuenta, una cifra muy potente para menos de cinco meses.</div>
+      </article>
+      <article class="card panel">
         <div class="eyebrow">Marcador principal</div><h2>La estrategia sigue siendo potente, pero el marcador honesto es el ajustado</h2>
         <div class="formula"><b>47.072,99 €</b><br>Opciones ajustadas = 73.140,85 € - 26.067,86 €<br><br><span class="label">Criterio realista: se descuentan pérdidas realizadas en acciones que vienen de asignaciones/gestión posterior de puts, principalmente ASTS y DUOL.</span></div>
         <div class="chips"><span class="chip good">Realizadas: +73.140,85 €</span><span class="chip bad">Ajuste: -26.067,86 €</span><span class="chip warn">Abiertas: +43.860,37 €</span><span class="chip good">Ajustadas + abiertas: +90.933,36 €</span></div>
-        <div class="note"><b>Lectura:</b> las opciones generan el grueso del resultado. En bruto explican el 78,1% del beneficio total medido por PyG, y con el criterio ajustado siguen explicando el 60,7%. Esto indica que la máquina funciona, pero hay que vigilar asignaciones y concentración.</div>
-      </article>
-      <article class="card panel">
-        <div class="eyebrow">Waterfall de opciones</div><h2>De prima bruta a resultado ajustado</h2>
-        <div class="waterfall">
-          <div class="col" style="height:88%"><span>+115.011 €</span><small>Ganancias<br>opciones</small></div>
-          <div class="col neg" style="height:32%"><span>-41.870 €</span><small>Pérdidas<br>opciones</small></div>
-          <div class="col gold" style="height:56%"><span>+73.141 €</span><small>Realizado<br>opciones</small></div>
-          <div class="col neg" style="height:20%"><span>-26.068 €</span><small>Ajuste<br>asign.</small></div>
-          <div class="col violet" style="height:36%"><span>+47.073 €</span><small>Opciones<br>ajustadas</small></div>
-        </div>
       </article>
     </section>
 
@@ -75,21 +75,21 @@
         <div class="note"><b>Cálculo:</b> he usado 21 semanas del año para la media semanal. La media mensual sale anualizando la media semanal: semana × 52 / 12.</div>
       </article>
       <article class="card panel">
-        <div class="eyebrow">YTD y fondos</div><h2>Foto global de la cuenta</h2>
-        <table class="table"><tr><th>Métrica</th><th>Valor</th></tr><tr><td>NAV final</td><td>638.170,59 €</td></tr><tr><td>YTD total TWR</td><td class="red">-0,21%</td></tr><tr><td>PyG total todos activos</td><td class="green">149.724,19 €</td></tr><tr><td>Efectivo final</td><td>110.135,40 €</td></tr><tr><td>Fondos disponibles / cartera</td><td>17,3%</td></tr><tr><td>Depósitos netos</td><td>70.000,00 €</td></tr></table>
-        <div class="note"><b>Importante:</b> el YTD TWR es prácticamente plano aunque la PyG por posiciones sea alta, porque son métricas distintas. El TWR mide rentabilidad temporal de la cuenta; la PyG total mide resultado acumulado de posiciones realizadas y abiertas.</div>
+        <div class="eyebrow">Foto global de la cuenta</div><h2>Datos actuales y YTD</h2>
+        <table class="table"><tr><th>Métrica</th><th>Valor</th></tr><tr><td>Valor liquidativo neto</td><td>641.969,77 €</td></tr><tr><td>Fondos disponibles</td><td>257.274,02 €</td></tr><tr><td>Fondos disponibles / cartera</td><td class="green">40,1%</td></tr><tr><td>Efectivo</td><td>110.170,19 €</td></tr><tr><td>Exceso de liquidez</td><td>293.209,28 €</td></tr><tr><td>Poder adquisitivo</td><td>1.715.160,11 €</td></tr><tr><td>YTD total TWR</td><td class="red">-0,21%</td></tr></table>
+        <div class="note"><b>Importante:</b> el ratio de fondos disponibles lo he calculado con la captura nueva: 257.274,02 € / 641.969,77 € = 40,1%.</div>
       </article>
     </section>
 
     <section class="grid two">
       <article class="card panel">
-        <div class="eyebrow">Componentes de opciones</div><h2>Realizado, abierto y lectura de riesgo</h2>
-        <div class="bars">
-          <div class="barRow"><span>Ganancias realizadas opciones</span><div class="track"><i style="width:100%"></i></div><b>115.011 €</b></div>
-          <div class="barRow"><span>Pérdidas realizadas opciones</span><div class="track red"><i style="width:36%"></i></div><b>-41.870 €</b></div>
-          <div class="barRow"><span>Total realizado opciones</span><div class="track amber"><i style="width:64%"></i></div><b>73.141 €</b></div>
-          <div class="barRow"><span>PyG no realizada opciones</span><div class="track violet"><i style="width:38%"></i></div><b>43.860 €</b></div>
-          <div class="barRow"><span>Total opciones</span><div class="track"><i style="width:100%"></i></div><b>117.001 €</b></div>
+        <div class="eyebrow">Waterfall de opciones</div><h2>De prima bruta a resultado ajustado</h2>
+        <div class="waterfall">
+          <div class="col" style="height:88%"><span>+115.011 €</span><small>Ganancias<br>opciones</small></div>
+          <div class="col neg" style="height:32%"><span>-41.870 €</span><small>Pérdidas<br>opciones</small></div>
+          <div class="col gold" style="height:56%"><span>+73.141 €</span><small>Realizado<br>opciones</small></div>
+          <div class="col neg" style="height:20%"><span>-26.068 €</span><small>Ajuste<br>asign.</small></div>
+          <div class="col violet" style="height:36%"><span>+47.073 €</span><small>Opciones<br>ajustadas</small></div>
         </div>
       </article>
       <article class="card panel">
@@ -101,10 +101,10 @@
 
     <section class="card panel" style="margin-top:13px">
       <div class="eyebrow">Diagnóstico</div><h2>Conclusión rápida</h2>
-      <div class="note"><b>La operativa de opciones de Danito es el motor principal.</b> En bruto va muy fuerte: 73.141 € realizados y 43.860 € abiertos. Ajustando asignaciones problemáticas, sigue quedando un resultado muy potente: 47.073 € realizados ajustados, equivalente a unos 9.714 €/mes. La clave ahora es que el control de riesgo evite que nuevas asignaciones devuelvan demasiado beneficio.</div>
+      <div class="note"><b>La operativa de opciones de Danito es el motor principal.</b> Las opciones realizadas suponen ya el 11,4% de la cartera y, sumando opciones abiertas, el peso sube al 18,2%. Lo más tranquilizador es que el colchón de fondos disponibles está en el 40,1%, muy alto para absorber volatilidad y asignaciones.</div>
     </section>
 
-    <div class="footer">Datos cargados desde informe IBKR U7563302 · Enero 1, 2026 - Mayo 22, 2026 · Dashboard focalizado en opciones.</div>
+    <div class="footer">Datos cargados desde informe IBKR U7563302 · Enero 1, 2026 - Mayo 22, 2026 y captura de fondos actual.</div>
   </main>
 </body>
 </html>
