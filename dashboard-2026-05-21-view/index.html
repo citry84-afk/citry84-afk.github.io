@@ -7,9 +7,9 @@
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <style>
-    :root{--card:rgba(15,23,42,.86);--line:rgba(148,163,184,.20);--txt:#f8fafc;--muted:#94a3b8;--green:#34d399;--amber:#fbbf24;--red:#fb7185}
+    :root{--card:rgba(15,23,42,.86);--line:rgba(148,163,184,.20);--txt:#f8fafc;--muted:#94a3b8;--green:#34d399;--amber:#fbbf24;--cyan:#22d3ee}
     *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 0 0,#173b85 0,#07111f 42%,#020617 100%);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;color:var(--txt)}
-    .wrap{width:min(1480px,calc(100% - 28px));margin:auto;padding:18px 0 34px}.weekly{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:13px}.card{background:linear-gradient(145deg,var(--card),rgba(15,23,42,.54));border:1px solid var(--line);border-radius:22px;box-shadow:0 18px 60px rgba(0,0,0,.28);backdrop-filter:blur(18px);padding:16px}.main{border-color:rgba(251,191,36,.48);background:linear-gradient(145deg,rgba(251,191,36,.20),rgba(15,23,42,.60))}.danger{border-color:rgba(251,113,133,.45);background:linear-gradient(145deg,rgba(251,113,133,.16),rgba(15,23,42,.60))}.label{color:var(--muted);font-size:12px;font-weight:900}.value{font-size:clamp(30px,4vw,54px);font-weight:950;letter-spacing:-.06em;margin:6px 0}.sub{color:#cbd5e1;font-size:12px;line-height:1.35}.good{color:#bbf7d0}.amber{color:#fde68a}.red{color:#fecdd3}iframe{display:block;width:100%;height:3100px;border:0;border-radius:22px;background:#07111f}@media(max-width:900px){.weekly{grid-template-columns:1fr}iframe{height:3800px}.wrap{width:min(100% - 18px,1480px);padding-top:12px}}
+    .wrap{width:min(1480px,calc(100% - 28px));margin:auto;padding:18px 0 34px}.weekly{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:13px}.card{background:linear-gradient(145deg,var(--card),rgba(15,23,42,.54));border:1px solid var(--line);border-radius:22px;box-shadow:0 18px 60px rgba(0,0,0,.28);backdrop-filter:blur(18px);padding:16px}.main{border-color:rgba(251,191,36,.48);background:linear-gradient(145deg,rgba(251,191,36,.20),rgba(15,23,42,.60))}.label{color:var(--muted);font-size:12px;font-weight:900}.value{font-size:clamp(30px,4vw,54px);font-weight:950;letter-spacing:-.06em;margin:6px 0}.sub{color:#cbd5e1;font-size:12px;line-height:1.35}.good{color:#bbf7d0}.amber{color:#fde68a}iframe{display:block;width:100%;height:3100px;border:0;border-radius:22px;background:#07111f}@media(max-width:900px){.weekly{grid-template-columns:1fr}iframe{height:3800px}.wrap{width:min(100% - 18px,1480px);padding-top:12px}}
   </style>
 </head>
 <body>
@@ -17,18 +17,18 @@
     <section class="weekly">
       <article class="card main">
         <div class="label">YTD cartera</div>
-        <div class="value good">22,02%</div>
-        <div class="sub">Rentabilidad total 2026 según PDF IBKR a 11/06/2026.</div>
+        <div class="value good">27,05%</div>
+        <div class="sub">Rentabilidad total 2026 según PDF IBKR a 17/06/2026.</div>
       </article>
       <article class="card main">
         <div class="label">Opciones ajustadas esta semana</div>
-        <div class="value amber">+50,76 €</div>
-        <div class="sub">Semana 24. Opciones ajustadas YTD: 11.626,43 €.</div>
+        <div class="value amber">+407,50 €</div>
+        <div class="sub">Semana 25. Opciones ajustadas YTD: 12.033,93 €.</div>
       </article>
-      <article class="card danger">
+      <article class="card main">
         <div class="label">Fondos disponibles / cartera</div>
-        <div class="value red">-1,4%</div>
-        <div class="sub">-1.055,46 € / 75.730,38 €. Liquidez a vigilar.</div>
+        <div class="value good">15,2%</div>
+        <div class="sub">12.033,26 € / 79.135,92 €. Liquidez recuperada.</div>
       </article>
     </section>
     <iframe src="/dashboard-2026-05-21/index.html" title="Luis Portfolio Control completo"></iframe>
