@@ -1,33 +1,104 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#07111f" />
   <title>Luis Portfolio Control</title>
-  <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="icon" href="/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="/icon.svg">
-  <link rel="apple-touch-icon-precomposed" href="/icon.svg">
-  <meta name="apple-mobile-web-app-title" content="Portfolio">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#07111f">
-  <meta http-equiv="refresh" content="0.4; url=/dashboard-2026-05-14/">
-  <style>
-    html,body{height:100%;margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:radial-gradient(circle at top left,#173b85 0,#07111f 45%,#020617 100%);color:#f8fafc;display:grid;place-items:center}
-    .card{width:min(360px,calc(100% - 40px));padding:28px;border:1px solid rgba(148,163,184,.22);border-radius:28px;background:rgba(15,23,42,.72);box-shadow:0 18px 60px rgba(0,0,0,.35);text-align:center}
-    img{width:92px;height:92px;border-radius:22px;margin-bottom:18px}
-    h1{font-size:26px;line-height:1;margin:0 0 10px;letter-spacing:-.04em}
-    p{margin:0;color:#cbd5e1;font-size:14px;line-height:1.4}
-  </style>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <main class="card">
-    <img src="/icon.svg" alt="Portfolio">
-    <h1>Luis Portfolio Control</h1>
-    <p>Abriendo la última versión del dashboard...</p>
+  <div class="bg-blur bg-blur-1"></div>
+  <div class="bg-blur bg-blur-2"></div>
+  <main class="app-shell">
+    <header class="hero card glass">
+      <div class="hero-copy">
+        <div class="eyebrow">Dashboard financiero personal</div>
+        <h1>Luis Portfolio Control</h1>
+        <p>Control semanal de cartera, opciones ajustadas, liquidez, riesgo y objetivos de independencia financiera.</p>
+      </div>
+      <div class="hero-tools">
+        <button class="ghost-btn" id="privacyBtn" type="button">👁️ Ocultar cifras</button>
+        <div class="hero-status" id="heroStatus">
+          <span class="status-dot"></span>
+          <div><strong id="statusText">Actualizando</strong><span id="lastUpdate">—</span></div>
+        </div>
+      </div>
+    </header>
+
+    <section class="kpi-grid sensitive" id="kpiGrid"></section>
+
+    <section class="card panel-main">
+      <div class="section-head explorer-head">
+        <div><span class="eyebrow">Explorador histórico</span><h2>Activa los años que quieras comparar</h2><p>2020–2021 reflejan la evolución de la cartera; desde 2022 también se incorpora el histórico de opciones ajustadas.</p></div>
+        <span class="chip" id="selectedYearsChip">2026</span>
+      </div>
+      <div class="year-controls" id="yearControls"></div>
+      <div class="history-summary sensitive" id="historySummary"></div>
+    </section>
+
+    <section class="grid two-cols">
+      <article class="card panel-main">
+        <div class="section-head"><div><span class="eyebrow">Evolución histórica</span><h2>Valor de cartera</h2></div><span class="chip green">YTD <strong id="ytdChip"></strong></span></div>
+        <div class="chart-wrap"><svg id="portfolioChart" role="img" aria-label="Gráfico histórico de cartera"></svg><div class="tooltip" id="portfolioTip"></div></div>
+      </article>
+      <article class="card panel-main">
+        <div class="section-head"><div><span class="eyebrow">Motor de ingresos</span><h2>Opciones ajustadas acumuladas</h2></div><span class="chip">Media <strong id="avgChip"></strong></span></div>
+        <div class="chart-wrap"><svg id="optionsYtdChart" role="img" aria-label="Gráfico de opciones ajustadas acumuladas"></svg><div class="tooltip" id="optionsTip"></div></div>
+      </article>
+    </section>
+
+    <section class="grid two-thirds">
+      <article class="card panel-main wide">
+        <div class="section-head"><div><span class="eyebrow">Volatilidad operativa</span><h2>Resultado semanal de opciones ajustadas</h2><p>Primas realizadas menos pérdidas realizadas por asignaciones. ORCL abierto se muestra aparte.</p></div><span class="chip">Última <strong id="weeklyChip"></strong></span></div>
+        <div class="chart-wrap tall"><svg id="weeklyOptionsChart" role="img" aria-label="Gráfico semanal de opciones ajustadas"></svg><div class="tooltip" id="weeklyTip"></div></div>
+      </article>
+      <aside class="card risk-card">
+        <div class="section-head compact"><div><span class="eyebrow">Semáforo</span><h2>Riesgo y liquidez</h2></div></div>
+        <div id="riskRows" class="risk-list sensitive"></div>
+        <div class="diagnosis" id="diagnosis"></div>
+      </aside>
+    </section>
+
+    <section class="grid two-cols">
+      <article class="card panel-main"><div class="section-head"><div><span class="eyebrow">Ingresos mensuales</span><h2>Opciones ajustadas por mes</h2></div></div><div class="chart-wrap"><svg id="monthlyOptionsChart"></svg><div class="tooltip" id="monthlyTip"></div></div></article>
+      <article class="card panel-main"><div class="section-head"><div><span class="eyebrow">Histórico anual</span><h2>Opciones ajustadas por año</h2></div></div><div class="chart-wrap"><svg id="annualOptionsChart"></svg><div class="tooltip" id="annualTip"></div></div></article>
+    </section>
+
+    <section class="grid two-cols">
+      <article class="card panel-main">
+        <div class="section-head"><div><span class="eyebrow">Calidad del resultado</span><h2>Opciones realizadas vs. riesgo pendiente</h2></div></div>
+        <div class="metric-table sensitive" id="optionsQuality"></div>
+      </article>
+      <article class="card panel-main">
+        <div class="section-head"><div><span class="eyebrow">Financiación</span><h2>Box spread GOOG</h2></div></div>
+        <div class="metric-table sensitive" id="boxSummary"></div>
+      </article>
+    </section>
+
+    <section class="card goal-card">
+      <div class="goal-grid">
+        <div>
+          <span class="eyebrow">Objetivo de ingresos</span>
+          <h2 class="goal-title">Camino a 10.000 €/mes con opciones ajustadas</h2>
+          <p id="goalLead"></p>
+          <div class="goal-year-box sensitive"><strong id="goalYear">—</strong><span>año estimado en el escenario actual</span></div>
+        </div>
+        <div>
+          <div class="section-head compact"><div><span class="eyebrow">Progreso mensual</span><h2>Ritmo actual</h2></div><strong class="goal-pct sensitive" id="goalPct">—</strong></div>
+          <div class="tank sensitive" id="goalTank"></div>
+          <div class="scenario-grid sensitive" id="scenarioGrid"></div>
+        </div>
+      </div>
+      <div class="objective-grid sensitive" id="objectives"></div>
+      <div class="stage-grid sensitive" id="incomeStages"></div>
+    </section>
+
+    <footer class="footer-note">Datos actualizados con el PDF IBKR YTD al 16/07/2026; liquidez del último pantallazo disponible (09/07/2026). El box se trata como financiación y ORCL como ajuste pendiente mientras siga abierto.</footer>
   </main>
-  <script>window.location.replace('/dashboard-2026-05-14/');</script>
+  <script src="/data.js"></script>
+  <script src="/app.js"></script>
 </body>
 </html>
