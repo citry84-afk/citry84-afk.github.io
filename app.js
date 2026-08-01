@@ -31,14 +31,17 @@ function init(){
 }
 
 function renderKpis(){
-  const c=D.current; const liquidityBase=c.liquidityPortfolio||c.portfolio; const fundsPct=pct(c.fundsAvailable,liquidityBase), excessPct=pct(c.excessLiquidity,liquidityBase);
+  const c=D.current;
+  const fundsPct=pct(c.fundsAvailable,c.portfolio);
+  const orclWeight=pct(c.orclMarketValueEur,c.portfolio);
+  const nvoWeight=pct(c.nvoMarketValueEur,c.portfolio);
   const kpis=[
-    ['Valor cartera',fmtEUR(c.portfolio,0),`${fmtPct(c.ytdManualPct)} TWR YTD · NAV PDF ${fmtEUR(c.pdfNav,0)}`, c.ytdManualPct>=0?'good':'bad'],
-    ['Opciones ajustadas YTD',fmtEUR(c.optionsYtd,0),`${fmtEUR(c.optionsWeekly,0)} esta semana · media ${fmtEUR(c.optionsAvgWeekly,0)}/semana`,'good'],
+    ['Valor cartera',fmtEUR(c.portfolio,0),`${fmtPct(c.ytdManualPct)} sobre capital neto aportado · base ${fmtEUR(c.contributed,0)}`, c.ytdManualPct>=0?'good':'bad'],
+    ['Opciones ajustadas YTD',fmtEUR(c.optionsYtd,0),`${fmtEUR(c.optionsWeekly,0)} esta semana · media ${fmtEUR(c.optionsAvgWeekly,0)}/semana`,c.optionsYtd>=0?'good':'bad'],
     ['Fondos disponibles',fmtEUR(c.fundsAvailable,0),`${fmtPct(fundsPct)} sobre cartera · pantallazo ${c.liquiditySnapshotDate}`,fundsPct>=20?'good':fundsPct>=10?'warn':'bad'],
-    ['Exceso liquidez',fmtEUR(c.excessLiquidity,0),`${fmtPct(excessPct)} sobre cartera · pantallazo ${c.liquiditySnapshotDate}`,excessPct>=25?'good':excessPct>=10?'warn':'bad'],
-    ['ORCL pendiente',fmtEUR(c.orclUnrealized,0),`${c.orclShares} acciones · no realizado`,c.orclUnrealized>=0?'good':'bad'],
-    ['Ajustadas prudentes',fmtEUR(c.optionsPrudent,0),`Opciones ajustadas si se marca ORCL a mercado`,c.optionsPrudent>=0?'warn':'bad']
+    ['Exposición ORCL',fmtEUR(c.orclMarketValueEur,0),`${c.orclShares} acciones · ${fmtPct(orclWeight)} del valor neto`,orclWeight<=D.rules.maxSingleStockPct?'good':orclWeight<=D.rules.hardSingleStockPct?'warn':'bad'],
+    ['Exposición NVO',fmtEUR(c.nvoMarketValueEur,0),`${c.nvoShares} acciones · ${fmtPct(nvoWeight)} del valor neto`,nvoWeight<=D.rules.maxSingleStockPct?'good':'bad'],
+    ['Ajustadas prudentes',fmtEUR(c.optionsPrudent,0),'Opciones ajustadas más P/L no realizado de ORCL y NVO',c.optionsPrudent>=0?'warn':'bad']
   ];
   document.getElementById('kpiGrid').innerHTML = kpis.map(k=>`<article class="card kpi ${k[3]}"><div class="label">${k[0]}</div><div class="value">${k[1]}</div><div class="sub">${k[2]}</div></article>`).join('');
 }
@@ -62,18 +65,23 @@ function renderHistorySummary(){
     ['Semanas de opciones',String(os.length)]
   ].map(x=>`<div class="objective"><h3>${x[0]}</h3><div class="big">${x[1]}</div></div>`).join('');
 }
+function riskLevelForConcentration(value){return value<=D.rules.maxSingleStockPct?'green':value<=D.rules.hardSingleStockPct?'amber':'red';}
 function renderRisks(){
   const c=D.current;
+  const fundsPct=pct(c.fundsAvailable,c.portfolio);
+  const orclWeight=pct(c.orclMarketValueEur,c.portfolio);
+  const nvoWeight=pct(c.nvoMarketValueEur,c.portfolio);
+  const boxWeight=pct(c.boxSpread,c.portfolio);
   const rows=[
-    {name:'Fondos disponibles', rule:'>20%', value:pct(c.fundsAvailable,c.liquidityPortfolio||c.portfolio), label:fmtPct(pct(c.fundsAvailable,c.liquidityPortfolio||c.portfolio)), level:pct(c.fundsAvailable,c.liquidityPortfolio||c.portfolio)>=20?'green':pct(c.fundsAvailable,c.liquidityPortfolio||c.portfolio)>=10?'amber':'red'},
-    {name:'Exceso de liquidez', rule:'>25%', value:pct(c.excessLiquidity,c.liquidityPortfolio||c.portfolio), label:fmtPct(pct(c.excessLiquidity,c.liquidityPortfolio||c.portfolio)), level:pct(c.excessLiquidity,c.liquidityPortfolio||c.portfolio)>=25?'green':pct(c.excessLiquidity,c.liquidityPortfolio||c.portfolio)>=10?'amber':'red'},
-    {name:'Poder adquisitivo', rule:'positivo', value:pct(c.buyingPower,c.liquidityPortfolio||c.portfolio), label:fmtEUR(c.buyingPower,0), level:c.buyingPower>0?'amber':'red'},
-    {name:'Efectivo', rule:'controlar deuda', value:pct(Math.abs(c.cash),c.grossSecurities), label:fmtEUR(c.cash,0), level:'red'},
-    {name:'Box GOOG', rule:'financiación, no ingreso', value:pct(c.boxSpread,c.portfolio), label:fmtPct(pct(c.boxSpread,c.portfolio)), level:pct(c.boxSpread,c.portfolio)<15?'amber':'red'},
-    {name:'ORCL abierto', rule:'vigilar', value:pct(Math.abs(c.orclUnrealized),c.portfolio), label:fmtEUR(c.orclUnrealized,0), level:'red'}
+    {name:'Fondos disponibles', rule:'mínimo 20% · ideal 25%', value:fundsPct, label:fmtPct(fundsPct), level:fundsPct>=20?'green':fundsPct>=10?'amber':'red'},
+    {name:'Concentración ORCL', rule:'máx. 30% · límite duro 35%', value:orclWeight, label:fmtPct(orclWeight), level:riskLevelForConcentration(orclWeight)},
+    {name:'P/L abierto ORCL', rule:'mostrar separado de lo realizado', value:pct(Math.abs(c.orclUnrealized),c.portfolio), label:fmtEUR(c.orclUnrealized,0), level:c.orclUnrealized>=0?'green':'red'},
+    {name:'Concentración NVO', rule:'máx. 30% · límite duro 35%', value:nvoWeight, label:fmtPct(nvoWeight), level:riskLevelForConcentration(nvoWeight)},
+    {name:'P/L abierto NVO', rule:'mostrar separado de lo realizado', value:pct(Math.abs(c.nvoUnrealized),c.portfolio), label:fmtEUR(c.nvoUnrealized,0), level:c.nvoUnrealized>=0?'green':'red'},
+    {name:'Box GOOG', rule:'financiación, no ingreso', value:boxWeight, label:fmtPct(boxWeight), level:boxWeight<D.rules.boxMaxPct?'amber':'red'}
   ];
   document.getElementById('riskRows').innerHTML = rows.map(row=>`<div class="risk-row"><div class="risk-row-top"><div><strong>${row.name}</strong><br><span>Regla: ${row.rule} · Actual: ${row.label}</span></div><em class="risk-pill ${row.level}">${row.level==='green'?'VERDE':row.level==='amber'?'VIGILAR':'ROJO'}</em></div><div class="progress"><i style="width:${clamp(Math.abs(row.value),4,100)}%"></i></div></div>`).join('');
-  document.getElementById('diagnosis').innerHTML = `<strong>Diagnóstico:</strong> el NAV del PDF cae a ${fmtEUR(c.portfolio,0)} y el TWR YTD a ${fmtPct(c.ytdManualPct)}. ORCL es el principal riesgo: ${fmtEUR(c.orclUnrealized,0)} no realizado en ${c.orclShares} acciones. Los datos de fondos disponibles, exceso y poder adquisitivo proceden del último pantallazo (${c.liquiditySnapshotDate}), por lo que deben confirmarse con una captura nueva.`;
+  document.getElementById('diagnosis').innerHTML = `<strong>Diagnóstico:</strong> la cartera vale ${fmtEUR(c.portfolio,0)}, un ${fmtPct(c.ytdManualPct)} frente al capital neto aportado de ${fmtEUR(c.contributed,0)}. Los fondos disponibles son ${fmtPct(fundsPct)}. ORCL mantiene una exposición de ${fmtEUR(c.orclMarketValueEur,0)} (${fmtPct(orclWeight)} del valor neto) y un P/L abierto de ${fmtEUR(c.orclUnrealized,0)}; sigue siendo el riesgo dominante.`;
 }
 function renderObjectives(){
   const c=D.current;
@@ -84,11 +92,14 @@ function metric(label,value,detail=''){return `<div class="risk-row"><div class=
 function renderQuality(){
   const c=D.current;
   document.getElementById('optionsQuality').innerHTML = [
-    metric('Opciones brutas realizadas YTD',fmtEUR(c.optionsGrossYtd,2),'Resultado realizado de opciones en el resumen realizado/no realizado del PDF'),
-    metric('Ajustes cerrados por asignaciones',fmtEUR(c.closedAssignmentAdjustments,2),'Incluye las pérdidas realizadas de ORCL vendidas tras asignación'),
+    metric('Opciones brutas realizadas YTD',fmtEUR(c.optionsGrossYtd,2),'Columna realizada de opciones del PDF'),
+    metric('P/L realizado de acciones asignadas',fmtEUR(c.assignmentRealizedTotal,2),'Ventas realizadas de VTGN, RPD, RGTI, ORCL y NVO'),
+    metric('Dividendos brutos de asignaciones',fmtEUR(c.assignmentDividendsGross,2),'Dividendos brutos de NVO y ORCL'),
+    metric('Ajuste neto por asignaciones',fmtEUR(c.closedAssignmentAdjustments,2),'P/L realizado de acciones más dividendos brutos'),
     metric('Opciones ajustadas realizadas',fmtEUR(c.optionsYtd,2),'Dato oficial para medir la estrategia'),
-    metric('ORCL abierto pendiente',fmtEUR(c.orclUnrealized,2),'No se resta oficialmente hasta cerrar/vender las acciones'),
-    metric('Marcador prudente',fmtEUR(c.optionsPrudent,2),'Opciones ajustadas si marcas ORCL a mercado')
+    metric('ORCL abierto pendiente',fmtEUR(c.orclUnrealized,2),`${c.orclShares} acciones; no se incorpora al realizado hasta vender`),
+    metric('NVO abierto pendiente',fmtEUR(c.nvoUnrealized,2),`${c.nvoShares} acciones residuales`),
+    metric('Marcador prudente',fmtEUR(c.optionsPrudent,2),'Opciones ajustadas más P/L no realizado de ORCL y NVO')
   ].join('');
 }
 function renderBox(){
@@ -102,15 +113,13 @@ function renderBox(){
 }
 function renderGoal(){
   const c=D.current, target=10000;
-  const progress=pct(c.optionsMonthlyAvg,target), weeklyTarget=target*12/52, weeklyProgress=pct(c.optionsAvgWeekly,weeklyTarget);
-  document.getElementById('goalLead').innerHTML=`Ritmo actual de opciones ajustadas: <strong>${fmtEUR(c.optionsMonthlyAvg,0)}/mes</strong>. Objetivo: <strong>${fmtEUR(target,0)}/mes</strong>.`;
+  const progress=pct(c.optionsMonthlyAvg,target);
+  document.getElementById('goalLead').innerHTML=`Ritmo actual de opciones ajustadas: <strong>${fmtEUR(c.optionsMonthlyAvg,0)}/mes</strong>. El objetivo final es <strong>${fmtEUR(target,0)}/mes</strong>, reduciendo el riesgo conforme crezca el capital.`;
   document.getElementById('goalPct').textContent=fmtPct(progress,0);
-  const rate=c.optionsMonthlyAvg/c.portfolio; const needed=target/rate;
-  const years=[[2026,83000],[2027,108000],[2028,138000],[2029,175000],[2030,222000],[2031,280000],[2032,350000],[2033,430000],[2034,500000],[2035,600000]];
-  const y=(years.find(x=>x[1]>=needed)||['2035+'])[0]; document.getElementById('goalYear').textContent=y;
+  document.getElementById('goalYear').textContent=fmtEUR(c.target500k,0);
   const cells=100,on=Math.round(clamp(progress,0,100)); document.getElementById('goalTank').innerHTML=Array.from({length:cells},(_,i)=>`<span class="tank-cell ${i<on?'on':''}"></span>`).join('');
-  document.getElementById('scenarioGrid').innerHTML=[['Actual',rate],['3,5%',.035],['3,0%',.03],['2,5%',.025],['2,0%',.02]].map(s=>`<div class="objective"><h3>${s[0]}</h3><div class="big">${(years.find(x=>x[1]>=target/s[1])||['2035+'])[0]}</div><div class="small">capital necesario ${fmtEUR(target/s[1],0)}</div></div>`).join('');
-  document.getElementById('incomeStages').innerHTML=[['Ayuda al sueldo','0–4.000 €/mes',clamp(pct(c.optionsMonthlyAvg,4000),0,100)],['Salario cubierto','4.000–8.000 €/mes',clamp(pct(c.optionsMonthlyAvg-4000,4000),0,100)],['Coste familiar','8.000–10.000 €/mes',clamp(pct(c.optionsMonthlyAvg-8000,2000),0,100)]].map(s=>`<div class="objective"><h3>${s[0]}</h3><div class="big">${s[1]}</div><div class="progress"><i style="width:${s[2]}%"></i></div><div class="small">${fmtPct(s[2],0)} completado</div></div>`).join('');
+  document.getElementById('scenarioGrid').innerHTML=[['1,0%',.01],['1,5%',.015],['2,0%',.02],['2,5%',.025],['3,0%',.03]].map(s=>`<div class="objective"><h3>${s[0]} mensual</h3><div class="big">${fmtEUR(target/s[1],0)}</div><div class="small">capital necesario para ${fmtEUR(target,0)}/mes</div></div>`).join('');
+  document.getElementById('incomeStages').innerHTML=[['Ayuda al sueldo','0–4.000 €/mes',clamp(pct(c.optionsMonthlyAvg,4000),0,100)],['Salario cubierto','4.000–8.000 €/mes',clamp(pct(c.optionsMonthlyAvg-4000,4000),0,100)],['Objetivo final','8.000–10.000 €/mes',clamp(pct(c.optionsMonthlyAvg-8000,2000),0,100)]].map(s=>`<div class="objective"><h3>${s[0]}</h3><div class="big">${s[1]}</div><div class="progress"><i style="width:${s[2]}%"></i></div><div class="small">${fmtPct(s[2],0)} completado</div></div>`).join('');
 }
 function renderCharts(){
   const port=activePortfolioSeries();
