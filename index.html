@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#07111f" />
   <title>Luis Portfolio Control</title>
-  <link rel="manifest" href="/manifest.webmanifest?v=20260731b" />
+  <link rel="manifest" href="/manifest.webmanifest?v=20260802a" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <link rel="stylesheet" href="/styles.css?v=20260731b" />
+  <link rel="stylesheet" href="/styles.css?v=20260802a" />
   <style>
     .weekly-share{margin:0 0 18px;padding:18px}.weekly-share-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}.weekly-share-head h2{margin:3px 0 0}.weekly-share-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.weekly-share-item{padding:16px;border:1px solid rgba(148,163,184,.22);border-radius:18px;background:rgba(15,23,42,.48)}.weekly-share-item .label{color:#94a3b8;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.weekly-share-item .value{margin:7px 0 4px;font-size:clamp(1.75rem,4vw,2.55rem);font-weight:900;letter-spacing:-.045em}.weekly-share-item .detail{color:#cbd5e1;font-size:.88rem}.weekly-share-item.good .value{color:#86efac}.weekly-share-item.bad .value{color:#fda4af}.weekly-share-item.warn .value{color:#fde68a}@media(max-width:720px){.weekly-share-grid{grid-template-columns:1fr}.weekly-share{padding:14px}.weekly-share-head{align-items:flex-start;flex-direction:column}}
   </style>
@@ -20,7 +20,7 @@
       <div class="hero-copy">
         <div class="eyebrow">Dashboard financiero personal</div>
         <h1>Luis Portfolio Control</h1>
-        <p>Control semanal de cartera, opciones ajustadas, liquidez, riesgo y objetivos de independencia financiera.</p>
+        <p>Control semanal de cartera, opciones ajustadas, fondos disponibles, riesgo y objetivos de independencia financiera.</p>
       </div>
       <div class="hero-tools">
         <button class="ghost-btn" id="privacyBtn" type="button">👁️ Ocultar cifras</button>
@@ -52,7 +52,7 @@
 
     <section class="grid two-cols">
       <article class="card panel-main">
-        <div class="section-head"><div><span class="eyebrow">Evolución histórica</span><h2>Valor de cartera</h2></div><span class="chip green">YTD <strong id="ytdChip"></strong></span></div>
+        <div class="section-head"><div><span class="eyebrow">Evolución histórica</span><h2>Valor de cartera</h2></div><span class="chip green">Sobre aportado <strong id="ytdChip"></strong></span></div>
         <div class="chart-wrap"><svg id="portfolioChart" role="img" aria-label="Gráfico histórico de cartera"></svg><div class="tooltip" id="portfolioTip"></div></div>
       </article>
       <article class="card panel-main">
@@ -63,11 +63,11 @@
 
     <section class="grid two-thirds">
       <article class="card panel-main wide">
-        <div class="section-head"><div><span class="eyebrow">Volatilidad operativa</span><h2>Resultado semanal de opciones ajustadas</h2><p>Primas realizadas menos pérdidas realizadas por asignaciones. ORCL abierto se muestra aparte.</p></div><span class="chip">Última <strong id="weeklyChip"></strong></span></div>
+        <div class="section-head"><div><span class="eyebrow">Volatilidad operativa</span><h2>Resultado semanal de opciones ajustadas</h2><p>Opciones realizadas más el resultado realizado de acciones asignadas y sus dividendos brutos. Las posiciones todavía abiertas se muestran aparte.</p></div><span class="chip">Última <strong id="weeklyChip"></strong></span></div>
         <div class="chart-wrap tall"><svg id="weeklyOptionsChart" role="img" aria-label="Gráfico semanal de opciones ajustadas"></svg><div class="tooltip" id="weeklyTip"></div></div>
       </article>
       <aside class="card risk-card">
-        <div class="section-head compact"><div><span class="eyebrow">Semáforo</span><h2>Riesgo y liquidez</h2></div></div>
+        <div class="section-head compact"><div><span class="eyebrow">Semáforo</span><h2>Riesgo y fondos disponibles</h2></div></div>
         <div id="riskRows" class="risk-list sensitive"></div>
         <div class="diagnosis" id="diagnosis"></div>
       </aside>
@@ -80,7 +80,7 @@
 
     <section class="grid two-cols">
       <article class="card panel-main">
-        <div class="section-head"><div><span class="eyebrow">Calidad del resultado</span><h2>Opciones realizadas vs. riesgo pendiente</h2></div></div>
+        <div class="section-head"><div><span class="eyebrow">Calidad del resultado</span><h2>Opciones realizadas y asignaciones</h2></div></div>
         <div class="metric-table sensitive" id="optionsQuality"></div>
       </article>
       <article class="card panel-main">
@@ -95,7 +95,7 @@
           <span class="eyebrow">Objetivo de ingresos</span>
           <h2 class="goal-title">Camino a 10.000 €/mes con opciones ajustadas</h2>
           <p id="goalLead"></p>
-          <div class="goal-year-box sensitive"><strong id="goalYear">—</strong><span>año estimado en el escenario actual</span></div>
+          <div class="goal-year-box sensitive"><strong id="goalYear">—</strong><span>capital de referencia al 2% mensual</span></div>
         </div>
         <div>
           <div class="section-head compact"><div><span class="eyebrow">Progreso mensual</span><h2>Ritmo actual</h2></div><strong class="goal-pct sensitive" id="goalPct">—</strong></div>
@@ -107,10 +107,10 @@
       <div class="stage-grid sensitive" id="incomeStages"></div>
     </section>
 
-    <footer class="footer-note">Datos actualizados con el PDF IBKR YTD al 30/07/2026; liquidez del pantallazo del 31/07/2026. El box se trata como financiación y ORCL como ajuste pendiente mientras siga abierto.</footer>
+    <footer class="footer-note">PDF IBKR YTD cerrado al 31/07/2026; valor de cartera y fondos disponibles del pantallazo tomado el 01/08/2026, correspondiente al cierre del 31/07. La rentabilidad se calcula frente al capital neto aportado de 53.975 €. La semana 29 conserva el NAV del PDF porque no se dispone del pantallazo.</footer>
   </main>
-  <script src="/data.js?v=20260731b"></script>
-  <script src="/app.js?v=20260731b"></script>
+  <script src="/data.js?v=20260802a"></script>
+  <script src="/app.js?v=20260802a"></script>
   <script>
     (function(){
       const c=window.PORTFOLIO_DATA.current,m=window.PORTFOLIO_DATA.meta;
@@ -119,7 +119,7 @@
       const fundsPct=c.portfolio?c.fundsAvailable/c.portfolio*100:0;
       document.getElementById('weeklyShareDate').textContent=`Semana ${m.week} · ${m.updated}`;
       const rows=[
-        {label:'YTD cartera',value:pctFmt(c.ibkrTwrPct),detail:'TWR según PDF IBKR',cls:c.ibkrTwrPct>=0?'good':'bad'},
+        {label:'Rentabilidad sobre aportado',value:pctFmt(c.ytdManualPct),detail:`${new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(c.portfolio)} frente a ${new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(c.contributed)}`,cls:c.ytdManualPct>=0?'good':'bad'},
         {label:'Variación opciones ajustadas',value:eur(c.optionsWeekly),detail:`Acumulado YTD: ${new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(c.optionsYtd)}`,cls:c.optionsWeekly>0?'good':c.optionsWeekly<0?'bad':'warn'},
         {label:'Fondos disponibles / cartera',value:pctFmt(fundsPct),detail:`${new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(c.fundsAvailable)} sobre ${new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(c.portfolio)}`,cls:fundsPct>=20?'good':fundsPct>=10?'warn':'bad'}
       ];
