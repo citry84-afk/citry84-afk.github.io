@@ -1,0 +1,16 @@
+toast.t=setTimeout(()=>el.classList.remove('show'),1800);if(navigator.vibrate)navigator.vibrate([8,20,10])}
+let rendering=false;
+function render(){const root=document.querySelector('#viewRoot');if(!root||rendering)return;rendering=true;root.innerHTML=dashboard(read());ensureDrawer();rendering=false}
+function maybeReplace(){const root=document.querySelector('#viewRoot');if(!root||root.querySelector('[data-options-v11]'))return;if(root.querySelector('.ffo-wrap'))render()}
+const root=document.querySelector('#viewRoot');if(root)new MutationObserver(()=>queueMicrotask(maybeReplace)).observe(root,{childList:true,subtree:false});setTimeout(maybeReplace,100);setTimeout(maybeReplace,800);
+document.addEventListener('click',e=>{
+  const tab=e.target.closest('[data-ot11-tab]');if(tab){document.querySelectorAll('[data-ot11-tab]').forEach(b=>b.classList.toggle('active',b===tab));document.querySelectorAll('[data-ot11-view]').forEach(v=>v.classList.toggle('active',v.dataset.ot11View===tab.dataset.ot11Tab));return}
+  if(e.target.closest('[data-ot11-import]')){document.querySelector('#ot11File')?.click();return}
+  if(e.target.closest('[data-ot11-flex]')){ensureDrawer();document.querySelector('.ot11-drawer')?.classList.add('show');return}
+  if(e.target.closest('[data-ot11-close]')||e.target.classList.contains('ot11-drawer')){document.querySelector('.ot11-drawer')?.classList.remove('show');return}
+},true);
+document.addEventListener('change',async e=>{
+  if(e.target.id!=='ot11File')return;const file=e.target.files?.[0];if(!file)return;
+  try{toast('Analizando el CSV…');const result=analyse(parseCSV(await file.text()),file.name),old=read(),next={...old,...result,imports:[...(old.imports||[]),{name:file.name,date:new Date().toISOString(),...result.summary}].slice(-12)};save(next);render();toast(`✓ ${result.summary.tradeCount} operaciones detectadas`)}catch(err){console.error(err);toast('No se pudo interpretar el archivo')}
+},true);
+})();
