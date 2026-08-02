@@ -1,0 +1,58 @@
+h4{margin:0;font-size:12px}.ot11-trade p{margin:4px 0 0;color:var(--muted);font-size:9px}.ot11-trade>span,.ot11-trade>b{text-align:right;font-size:11px}.ot11-pill{display:inline-flex;width:max-content;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:#17365e;color:#9dc4ff;font-size:9px;font-weight:900}.ot11-pill.orange{background:#422810;color:#ffc08b}.ot11-pill.green{background:#113b35;color:#82e8ce}.ot11-pill.red{background:#43222a;color:#ffacb5}.ot11-strategies{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ot11-strategy{padding:15px;border:1px solid #203650;border-radius:17px;background:#0a192b}.ot11-strategy-head{display:flex;justify-content:space-between;gap:10px}.ot11-strategy h4{margin:0;font-size:13px}.ot11-strategy p{margin:5px 0 0;color:var(--muted);font-size:10px}.ot11-strategy-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:13px}.ot11-strategy-metrics div{padding:8px;border-radius:10px;background:#0f2138}.ot11-strategy-metrics span{display:block;color:#6f87a8;font-size:8px}.ot11-strategy-metrics b{display:block;margin-top:4px;font-size:10px}.ot11-empty{display:grid;place-items:center;min-height:210px;padding:24px;text-align:center;border:1px dashed #27415f;border-radius:17px;background:#081625}.ot11-empty span{font-size:38px}.ot11-empty b{display:block;margin-top:10px}.ot11-empty p{max-width:360px;margin:6px auto 15px;color:var(--muted);font-size:11px;line-height:1.5}.ot11-import{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:17px;border:1px solid #294562;border-radius:18px;background:linear-gradient(135deg,#102947,#0a1a2e)}.ot11-import h3{margin:0;font-size:15px}.ot11-import p{margin:5px 0 0;color:var(--muted);font-size:10px;line-height:1.45}.ot11-note{padding:11px 13px;border-radius:13px;background:#13253c;color:#88a0bf;font-size:10px;line-height:1.45}.ot11-note strong{color:#fff}.ot11-drawer{position:fixed;inset:0;z-index:99999;display:none;place-items:center;padding:18px;background:rgba(3,10,20,.68);backdrop-filter:blur(10px)}.ot11-drawer.show{display:grid}.ot11-sheet{width:min(620px,100%);max-height:88vh;overflow:auto;padding:22px;border:1px solid #284463;border-radius:24px;background:#0a1728;color:#fff;box-shadow:0 35px 100px #0008}.ot11-sheet-head{display:flex;justify-content:space-between;gap:12px}.ot11-sheet h3{margin:0}.ot11-close{width:42px;height:42px;border:1px solid #29425f;border-radius:50%;background:#10243c;color:#fff;font-size:23px}.ot11-toast{position:fixed;left:50%;bottom:90px;z-index:999999;transform:translate(-50%,18px);opacity:0;padding:11px 16px;border-radius:999px;background:#fff;color:#07162a;font-weight:900;font-size:12px;box-shadow:0 15px 50px #0005;transition:.25s}.ot11-toast.show{opacity:1;transform:translate(-50%,0)}
+@keyframes ot11grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media(max-width:900px){.ot11-summary{grid-template-columns:repeat(3,1fr)}.ot11-grid{grid-template-columns:1fr}.ot11-card.full{grid-column:auto}}
+@media(max-width:620px){.ot11{margin:0 -5px 105px;padding:11px;border-radius:21px}.ot11-top{display:grid}.ot11-actions{justify-content:flex-start}.ot11-summary{grid-template-columns:repeat(2,1fr)}.ot11-kpi{min-height:100px}.ot11-months{grid-template-columns:repeat(3,1fr)}.ot11-calendar{gap:3px}.ot11-day{min-height:50px;padding:5px}.ot11-day b{margin-top:8px;font-size:8px}.ot11-trade{grid-template-columns:1fr auto}.ot11-trade>*:nth-child(2){display:none}.ot11-trade>*:nth-child(3){text-align:left}.ot11-strategies{grid-template-columns:1fr}.ot11-import{grid-template-columns:1fr}.ot11-big{font-size:20px}.ot11-card{padding:14px}}
+`;
+document.head.appendChild(style);
+
+function parseCSV(text){
+  const out=[];let row=[],field='',quoted=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(quoted){if(c==='"'&&text[i+1]==='"'){field+='"';i++}else if(c==='"')quoted=false;else field+=c}
+    else{if(c==='"')quoted=true;else if(c===','){row.push(field);field=''}else if(c==='\n'){row.push(field.replace(/\r$/,''));out.push(row);row=[];field=''}else field+=c}
+  }
+  if(field||row.length){row.push(field);out.push(row)}
+  return out;
+}
+function symbolParts(symbol){
+  const m=String(symbol).match(/^([A-Z0-9.]+)\s+(\d{2}[A-Z]{3}\d{2})\s+([\d.]+)\s+([PC])$/);
+  return m?{underlying:m[1],expiry:m[2],strike:num(m[3]),right:m[4]}:{underlying:String(symbol||''),expiry:'',strike:0,right:''};
+}
+function detectBoxes(open){
+  const groups={};
+  open.forEach(p=>{const key=`${p.underlying}|${p.expiry}`;(groups[key]??=[]).push(p)});
+  const boxes=[];
+  Object.values(groups).forEach(g=>{
+    const strikes=[...new Set(g.map(x=>x.strike))].sort((a,b)=>a-b);
+    if(g.length===4&&strikes.length===2&&strikes.every(s=>g.some(x=>x.strike===s&&x.right==='C')&&g.some(x=>x.strike===s&&x.right==='P'))){g.forEach(x=>x.structure='box');boxes.push({underlying:g[0].underlying,expiry:g[0].expiry,strikes,legs:g})}
+  });
+  return boxes;
+}
+function detectRolls(trades){
+  const groups={};
+  trades.forEach(t=>{const key=`${datePart(t.date)}|${t.underlying}|${t.right}`;(groups[key]??=[]).push(t)});
+  return Object.entries(groups).filter(([,g])=>g.some(t=>String(t.code).includes('C')&&t.quantity>0)&&g.some(t=>String(t.code).includes('O')&&t.quantity<0)).map(([key,legs])=>({key,date:datePart(legs[0].date),underlying:legs[0].underlying,right:legs[0].right,legs,credit:legs.reduce((s,t)=>s+t.proceeds+t.commission,0)}));
+}
+function analyse(rows,name){
+  const open=[],trades=[],events=[];
+  for(const r of rows){
+    if(r[0]==='Posiciones abiertas'&&r[1]==='Data'&&String(r[3]).includes('Opciones')){
+      const p=symbolParts(r[5]);open.push({...p,symbol:r[5],currency:r[4]||'USD',quantity:num(r[6]),multiplier:num(r[7])||100,costPrice:num(r[8]),costBasis:num(r[9]),closePrice:num(r[10]),value:num(r[11]),unrealized:num(r[12]),structure:''});
+    }
+    if(r[0]==='Operaciones'&&r[1]==='Data'&&String(r[3]).includes('Opciones')){
+      const p=symbolParts(r[5]);const code=r[15]||'';const t={...p,symbol:r[5],currency:r[4]||'USD',date:r[6],quantity:num(r[7]),price:num(r[8]),proceeds:num(r[10]),commission:num(r[11]),realized:num(r[13]),mtm:num(r[14]),code};trades.push(t);
+      if(code.includes('A;C'))events.push({...t,event:'assignment'});else if(code.includes('C;Ep'))events.push({...t,event:'expiration'});else if(code.includes('C;Ex'))events.push({...t,event:'exercise'});
+    }
+  }
+  const boxes=detectBoxes(open),rolls=detectRolls(trades);
+  const naked=open.filter(x=>x.right==='P'&&x.quantity<0&&x.structure!=='box');
+  const exposure=naked.reduce((s,x)=>s+x.strike*Math.abs(x.quantity)*x.multiplier,0);
+  const realized=trades.reduce((s,x)=>s+x.realized,0);
+  const summary={file:name,rows:rows.length,openCount:open.length,tradeCount:trades.length,boxes:boxes.length,nakedPuts:naked.length,assignmentExposure:exposure,realized,unrealized:open.reduce((s,x)=>s+x.unrealized,0),assignments:events.filter(e=>e.event==='assignment').length,expirations:events.filter(e=>e.event==='expiration').length,exercises:events.filter(e=>e.event==='exercise').length,rolls:rolls.length,updatedAt:new Date().toISOString()};
+  return{open,trades,events,rolls,summary};
+}
+function closedTrades(d){return(d.trades||[]).filter(t=>Math.abs(num(t.realized))>.0001)}
+function stats(d){
+  const closed=closedTrades(d),wins=closed.filter(t=>t.realized>0),losses=closed.filter(t=>t.realized<0),be=closed.filter(t=>t.realized===0);
+  const grossWin=wins.reduce((s,t)=>s+t.realized,0),gro
