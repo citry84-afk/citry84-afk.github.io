@@ -1,0 +1,38 @@
+(() => {
+  'use strict';
+  const STORAGE_KEY = 'ff_mi_plan_v2';
+  const url = new URL(location.href);
+  if (url.searchParams.get('nuevo') === '1') {
+    try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+    url.searchParams.delete('nuevo');
+    history.replaceState({}, '', url.pathname + (url.search ? url.search : '') + url.hash);
+  }
+  let existing = null;
+  try { existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch (_) {}
+  if (existing?.onboardingComplete) return;
+
+  const TYPES = {
+    cash:{label:'Banco y efectivo',icon:'€',financial:true,liquid:true}, funds:{label:'Fondos / ETF',icon:'◫',financial:true},
+    stocks:{label:'Acciones',icon:'↗',financial:true}, options:{label:'Opciones',icon:'◎',financial:true},
+    pension:{label:'Plan de pensiones',icon:'◌',financial:true}, crypto:{label:'Criptomonedas',icon:'◇',financial:true},
+    realestate:{label:'Inmuebles',icon:'⌂'}, debt:{label:'Hipotecas y deudas',icon:'−'}, other:{label:'Otros activos',icon:'＋'}
+  };
+  const DISCOVERY = [
+    ['cash','Banco','¿Tienes dinero en el banco o en efectivo?','Cuenta corriente, ahorro, depósitos disponibles o dinero en efectivo.'],
+    ['funds','Fondos','¿Tienes dinero en fondos de inversión o ETF?','Inversiones que reúnen muchas empresas o activos dentro de un mismo producto.'],
+    ['stocks','Acciones','¿Tienes acciones de empresas concretas?','Por ejemplo, Apple, Telefónica, Palantir o cualquier otra empresa.'],
+    ['options','Opciones','¿Utilizas opciones financieras?','Compra o venta de opciones, spreads, asignaciones o estrategias para cobrar primas.'],
+    ['pension','Pensiones','¿Tienes un plan de pensiones o ahorro para la jubilación?','Dinero reservado para el futuro que normalmente no puedes retirar libremente ahora.'],
+    ['crypto','Cripto','¿Tienes Bitcoin, Ethereum u otras criptomonedas?','Incluye lo que guardas en plataformas o monederos digitales.'],
+    ['realestate','Inmuebles','¿Tienes viviendas, locales, terrenos o garajes en propiedad?','Incluye tu vivienda habitual y cualquier inmueble alquilado o de uso personal.'],
+    ['debt','Deudas','¿Tienes hipotecas, préstamos o alguna otra deuda?','El dinero que todavía debes a bancos, familiares o empresas financieras.'],
+    ['other','Otros','¿Tienes algún otro activo que quieras incluir?','Por ejemplo, un negocio, participaciones, seguros de ahorro u objetos de valor.']
+  ].map(([type,short,question,explanation])=>({type,short,question,explanation,...TYPES[type]}));
+  const GOALS={
+    calm:{title:'Vivir con más tranquilidad',subtitle:'Colchón, ahorro y control del mes',icon:'◌',target:30000},
+    home:{title:'Comprar una vivienda',subtitle:'Entrada, gastos y fecha objetivo',icon:'⌂',target:90000},
+    income:{title:'Generar ingresos mensuales',subtitle:'Dividendos, alquileres y primas',icon:'↗',target:3000},
+    wealth:{title:'Construir mi patrimonio',subtitle:'Inversiones, inmuebles y objetivos',icon:'◇',target:500000}
+  };
+  const POS=[[50,6],[80,15],[94,40],[88,70],[65,89],[35,89],[12,70],[6,40],[20,15]];
+  const state={step:0,name:'',household:'individual',answers:{},values:{},meta:{},pending:new Set(),monthlyIncome:0,incomeStability:'stable',contribution:500,goalType:'wealth',goalTarget:500000,goalCurrent:0,horizon:15,frequency:'monthly',detail:'
