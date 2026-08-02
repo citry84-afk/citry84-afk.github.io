@@ -15,6 +15,7 @@
       if(e.target.closest('[data-options-retry]')) location.reload();
     });
     document.body.appendChild(overlay);
+    window.dispatchEvent(new CustomEvent('ff-options-error',{detail:{message:String(error&&error.message||error)}}));
   };
   const loadScript=src=>new Promise((resolve,reject)=>{
     const s=document.createElement('script');
@@ -58,7 +59,8 @@
       if(!response.ok) throw new Error(`No se pudo descargar ${path}`);
       return response.text();
     }));
-    (0,eval)(parts.join(''));
+    await (0,eval)(parts.join(''));
+    window.dispatchEvent(new CustomEvent('ff-options-ready'));
   }catch(error){
     console.error('Options module error',error);
     showError(error);
