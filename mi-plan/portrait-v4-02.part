@@ -1,0 +1,20 @@
+complete',minLiquidity:20,maxConcentration:25};
+  const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+  const safe=v=>Number.isFinite(Number(v))?Number(v):0;
+  const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const euro=(v,compact=false)=>new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0,notation:compact?'compact':'standard'}).format(safe(v));
+  const pct=v=>`${new Intl.NumberFormat('es-ES',{maximumFractionDigits:1}).format(safe(v))} %`;
+  const id=()=>`${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+  const now=()=>new Date().toISOString();
+  const dateIso=d=>new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  const onboarding=$('#onboarding'), app=$('#app'), reveal=$('#reveal');
+  app?.classList.add('hidden'); reveal?.classList.add('hidden'); onboarding?.classList.remove('hidden'); document.body.classList.remove('app-active');
+
+  onboarding.innerHTML=`<div class="onboarding-main portrait-main"><div class="progress-row"><span id="portraitLabel">Tu fotografía</span><strong id="portraitCounter">Empezamos</strong></div><div class="progress-track"><i id="portraitProgress"></i></div><div id="portraitContent" class="onboarding-content"></div><div class="onboarding-actions"><button class="ghost" id="portraitBack" type="button">Atrás</button><button class="primary" id="portraitNext" type="button">Continuar <span>→</span></button></div></div><aside class="preview-card portrait-preview"><div class="preview-label"><span>Tu fotografía se construye en directo</span><b><i></i> EN VIVO</b></div><div id="portraitMap" class="preview-phone"></div></aside>`;
+  if (!$('#portraitHelp')) document.body.insertAdjacentHTML('beforeend',`<dialog id="portraitHelp" class="help-modal"><div class="help-sheet"><button class="close" type="button" data-close-help>×</button><span class="help-icon">i</span><p class="eyebrow">EXPLICADO FÁCIL</p><h2 id="portraitHelpTitle"></h2><p id="portraitHelpText"></p><div class="help-example"><strong>Ejemplo</strong><span id="portraitHelpExample"></span></div><button class="primary help-understood" type="button" data-close-help>Entendido</button></div></dialog><div id="portraitJoy" class="portrait-joy"><div><span id="portraitJoyIcon">✓</span><b id="portraitJoyTitle">¡Perfecto!</b><small id="portraitJoyText"></small></div></div><div id="portraitToast" class="toast"></div>`);
+  const content=$('#portraitContent'), label=$('#portraitLabel'), counter=$('#portraitCounter'), progress=$('#portraitProgress'), back=$('#portraitBack'), next=$('#portraitNext'), map=$('#portraitMap');
+  const HELP={
+    name:['¿Qué nombre escribo?','El nombre que quieres ver en la aplicación. No hace falta poner apellidos.','Luis'],
+    household:['¿A quién representa el mapa?','Elige si controlarás solo tu dinero, el de una pareja o el patrimonio familiar.','Pareja si compartís vivienda, cuentas o inversiones.'],
+    value:['¿Qué cantidad pongo?','Suma aproximadamente todo lo que tienes dentro de esta categoría. No hace falta acertar al euro.','6.000 € en un banco y 4.000 € en otro: escribe 10000.'],
+    where:['¿Qué escribo aquí?','El banco, broker, plataforma o una descrip
