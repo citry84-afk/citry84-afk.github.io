@@ -1,0 +1,41 @@
+ssLoss=Math.abs(losses.reduce((s,t)=>s+t.realized,0));
+  return{closed,wins:wins.length,losses:losses.length,be:be.length,profitFactor:grossLoss?grossWin/grossLoss:(grossWin?Infinity:0),winRate:(wins.length+losses.length)?wins.length/(wins.length+losses.length)*100:0,realized:closed.reduce((s,t)=>s+t.realized,0)};
+}
+function dailyData(d){const map={};(d.trades||[]).forEach(t=>{const key=datePart(t.date);if(key)map[key]=(map[key]||0)+num(t.realized)});return Object.entries(map).sort((a,b)=>a[0].localeCompare(b[0])).map(([date,value])=>({date,value}))}
+function monthlyData(d){
+  const map={};(d.trades||[]).forEach(t=>{const key=monthKey(t.date);if(!key)return;map[key]??={month:key,pnl:0,count:0,gross:0};map[key].pnl+=num(t.realized);map[key].count++;if(t.quantity<0&&t.proceeds>0)map[key].gross+=t.proceeds});
+  return Object.values(map).sort((a,b)=>a.month.localeCompare(b.month));
+}
+function cumulativeChart(d){
+  const daily=dailyData(d);if(!daily.length)return empty('⌁','Todavía no hay curva de resultados','Importa un CSV de Interactive Brokers para dibujar el P&L acumulado.');
+  let total=0;const pts=daily.map(x=>({...x,value:(total+=x.value)}));
+  const w=760,h=265,l=48,r=15,t=18,b=34,vals=pts.map(x=>x.value);let min=Math.min(0,...vals),max=Math.max(0,...vals);if(max===min)max=min+1;const pad=(max-min)*.1;min-=pad;max+=pad;
+  const x=i=>pts.length===1?w/2:l+i*(w-l-r)/(pts.length-1),y=v=>t+(max-v)*(h-t-b)/(max-min);const coords=pts.map((p,i)=>[x(i),y(p.value)]);const path=coords.map((p,i)=>`${i?'L':'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');const area=`${path} L${coords.at(-1)[0]},${h-b} L${coords[0][0]},${h-b} Z`;
+  const grids=[0,.5,1].map(q=>{const yy=t+q*(h-t-b),v=max-q*(max-min);return`<line class="ot11-gridline" x1="${l}" x2="${w-r}" y1="${yy}" y2="${yy}"/><text class="ot11-axis" x="${l-5}" y="${yy+4}" text-anchor="end">${euro(v,true)}</text>`}).join('');
+  const labels=[0,Math.floor((pts.length-1)/2),pts.length-1].filter((v,i,a)=>a.indexOf(v)===i).map(i=>`<text class="ot11-axis" x="${x(i)}" y="${h-10}" text-anchor="middle">${longDate(pts[i].date)}</text>`).join('');
+  const dots=coords.filter((_,i)=>i===coords.length-1).map((p,i)=>`<circle class="ot11-dot" cx="${p[0]}" cy="${p[1]}" r="5"/>`).join('');
+  return`<svg class="ot11-svg" viewBox="0 0 ${w} ${h}"><defs><linearGradient id="ot11Line" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#3784ff"/><stop offset="1" stop-color="#ff7a16"/></linearGradient><linearGradient id="ot11Area" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3784ff" stop-opacity=".28"/><stop offset="1" stop-color="#3784ff" stop-opacity=".01"/></linearGradient></defs>${grids}<path class="ot11-area" d="${area}"/><path class="ot11-line" d="${path}"/>${dots}${labels}</svg>`;
+}
+function monthGrid(d){
+  const data=monthlyData(d),by=Object.fromEntries(data.map(x=>[x.month,x]));const year=Number((data.at(-1)?.month||new Date().getFullYear()).slice(0,4))||new Date().getFullYear();
+  return`<div class="ot11-months">${Array.from({length:12},(_,i)=>{const key=`${year}-${String(i+1).padStart(2,'0')}`,m=by[key];return`<div class="ot11-month ${!m?'empty':m.pnl>=0?'good':'bad'}"><span>${monthName(key)}</span><b>${m?euro(m.pnl,true):'—'}</b><small>${m?`${m.count} movimientos`:'sin datos'}</small></div>`}).join('')}</div>`;
+}
+function calendar(d){
+  const daily=dailyData(d),latest=daily.at(-1)?.date||new Date().toISOString().slice(0,10),[y,m]=latest.split('-').map(Number),first=new Date(y,m-1,1),days=new Date(y,m,0).getDate(),offset=(first.getDay()+6)%7,map=Object.fromEntries(daily.map(x=>[x.date,x.value])),max=Math.max(1,...Object.values(map).map(Math.abs));
+  return`<div class="ot11-calendar">${['L','M','X','J','V','S','D'].map(x=>`<div class="ot11-weekday">${x}</div>`).join('')}${Array.from({length:offset},()=>'<div class="ot11-day blank"></div>').join('')}${Array.from({length:days},(_,i)=>{const day=i+1,key=`${y}-${String(m).padStart(2,'0')}-${String(day).padStart(2,'0')}`,v=map[key]||0,heat=Math.min(.55,.08+Math.abs(v)/max*.47);return`<div class="ot11-day ${v>0?'good':v<0?'bad':''}" style="--heat:${heat}"><span>${day}</span><b>${v?euro(v,true):''}</b></div>`}).join('')}</div>`;
+}
+function rank(d){
+  const groups={};(d.trades||[]).forEach(t=>{const k=t.underlying||'—';groups[k]??={pnl:0,count:0};groups[k].pnl+=t.realized;groups[k].count++});const rows=Object.entries(groups).sort((a,b)=>Math.abs(b[1].pnl)-Math.abs(a[1].pnl)).slice(0,8),max=Math.max(1,...rows.map(x=>Math.abs(x[1].pnl)));
+  return rows.length?`<div class="ot11-rank">${rows.map(([sym,v])=>`<div class="ot11-rank-row"><span>${esc(sym)}</span><div class="ot11-track"><i style="width:${Math.abs(v.pnl)/max*100}%"></i></div><b style="color:${v.pnl>=0?'var(--green)':'var(--red)'}">${euro(v.pnl,true)}</b></div>`).join('')}</div>`:empty('⌁','Sin tickers todavía','Importa el CSV para descubrir qué subyacentes explican el resultado.');
+}
+function openStrategies(d){
+  const boxes={};(d.open||[]).filter(p=>p.structure==='box').forEach(p=>{const k=`${p.underlying}|${p.expiry}`;(boxes[k]??=[]).push(p)});const cards=[];
+  Object.values(boxes).forEach(g=>{const strikes=[...new Set(g.map(x=>x.strike))].sort((a,b)=>a-b);cards.push({kind:'BOX',name:`${g[0].underlying} · ${strikes.join(' / ')}`,sub:`Vence ${g[0].expiry}`,contracts:Math.max(...g.map(x=>Math.abs(x.quantity))),value:g.reduce((s,x)=>s+x.value,0),pnl:g.reduce((s,x)=>s+x.unrealized,0)})});
+  (d.open||[]).filter(p=>p.structure!=='box').forEach(p=>cards.push({kind:p.quantity<0?(p.right==='P'?'PUT VENDIDA':'CALL VENDIDA'):'OPCIÓN COMPRADA',name:`${p.underlying} ${p.strike} ${p.right}`,sub:`Vence ${p.expiry}`,contracts:Math.abs(p.quantity),value:p.value,pnl:p.unrealized}));
+  return cards.length?`<div class="ot11-strategies">${cards.map(c=>`<div class="ot11-strategy"><div class="ot11-strategy-head"><div><span class="ot11-pill ${c.kind==='BOX'?'orange':'green'}">${c.kind}</span><h4>${esc(c.name)}</h4><p>${esc(c.sub)}</p></div><b style="color:${c.pnl>=0?'var(--green)':'var(--red)'}">${euro(c.pnl,true)}</b></div><div class="ot11-strategy-metrics"><div><span>Contratos</span><b>${c.contracts}</b></div><div><span>Valor</span><b>${euro(c.value,true)}</b></div><div><span>Estado</span><b>${c.kind==='BOX'?'Financiación':'Abierta'}</b></div></div></div>`).join('')}</div>`:empty('◎','No hay posiciones abiertas','Las posiciones activas aparecerán agrupadas como estrategias, no como patas aisladas.');
+}
+function recentTrades(d){
+  const rows=[...(d.trades||[])].sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,20);
+  return rows.length?`<div class="ot11-list">${rows.map(t=>{const event=t.code.includes('A;C')?'ASIGNACIÓN':t.code.includes('C;Ep')?'VENCIMIENTO':t.code.includes('C;Ex')?'EJERCICIO':t.code.includes('O')?'APERTURA':'CIERRE';return`<div class="ot11-trade"><div><span class="ot11-pill ${event==='APERTURA'?'green':event==='ASIGNACIÓN'?'orange':''}">${event}</span><h4>${esc(t.symbol)}</h4><p>${esc(t.date)} · ${t.quantity} contrato(s)</p></div><span>${t.quantity<0?'Vendida':'Comprada'}</span><b>${euro(t.proceeds,true)}</b><b style="color:${t.realized>=0?'var(--green)':'var(--red)'}">${euro(t.realized,true)}</b></div>`}).join('')}</div>`:empty('≡','Aún no hay diario','Cada operación importada aparecerá con su tipo, importe y resultado.');
+}
+function empty(icon,title,text){return`<div class="ot11-empty"><div><span>${icon}</span><b>${title}</b><p>${text}</p><button class="ot11-btn primary" data-ot11-import>Importar CSV</button></div></d
