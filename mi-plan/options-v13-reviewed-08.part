@@ -1,0 +1,88 @@
+.ffv13-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px;margin-bottom:6px;border:1px solid var(--line);border-radius:14px;background:#0b1728}
+.ffv13-row.muted{grid-template-columns:1fr;color:var(--muted)}
+.ffv13-row b{display:block;font-size:12px}
+.ffv13-row small{display:block;color:var(--muted);font-size:11px}
+.ffv13-tick{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#17365f;font:900 11px system-ui}
+.ffv13-rocval{text-align:right}.ffv13-rocval b{font-size:15px;letter-spacing:-.02em}
+.ffv13-roc{display:inline-block;margin-top:3px;padding:2px 7px;border-radius:999px;background:rgba(61,135,255,.16);color:#8dbaff;font-size:10px;font-weight:900}
+.ffv13-empty{padding:34px 18px;border:1px dashed var(--line);border-radius:18px;text-align:center;color:var(--muted)}
+.ffv13-empty b{display:block;margin-bottom:5px;color:#f6f9ff;font-size:14px}
+.ffv13-toast{position:fixed;left:50%;bottom:96px;z-index:10000;transform:translateX(-50%);max-width:88vw;padding:13px 17px;border-radius:15px;background:#0f2037;border:1px solid #32609a;color:#f6f9ff;font:800 13px system-ui;box-shadow:0 18px 50px rgba(4,16,34,.5)}
+.oi12-tabs button[data-ffv13-tab].active{background:#17365f;color:#fff;box-shadow:inset 0 0 0 1px #32609a}
+.oi12.ffv13-hide-v12 .oi12-view{display:none!important}
+@media(max-width:840px){
+  .ffv13-yearbar{grid-template-columns:1fr}
+  .ffv13-months{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .ffv13-monthgrid,.ffv13-two{grid-template-columns:1fr}
+  .ffv13-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:560px){
+  .ffv13-section{padding:13px;border-radius:17px}
+  .ffv13-day{min-height:38px}
+  .ffv13-day s{font-size:8px}
+  .ffv13-kpi b{font-size:19px}
+}
+@media(prefers-reduced-motion:reduce){.ffv13 *{animation:none!important;transition:none!important}}`;
+  document.head.appendChild(s);
+}
+
+function toast(msg) {
+  document.querySelector('.ffv13-toast')?.remove();
+  const el = document.createElement('div');
+  el.className = 'ffv13-toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 4200);
+}
+
+/* ================================================================
+   6. INYECCIÓN EN LA INTERFAZ DE v12
+   ================================================================ */
+let injecting = false;
+
+function currentData() { return readJSON(STORE) || {}; }
+
+function inject() {
+  const root = document.querySelector('#viewRoot .oi12');
+  if (!root || injecting) return;
+  injecting = true;
+  try {
+    injectStyles();
+    root.classList.add('ffv13');
+    const data = currentData();
+    const cycles = buildCycles(data);
+
+    /* --- pestaña Calendario --- */
+    const tabs = root.querySelector('.oi12-tabs');
+    if (tabs && !tabs.querySelector('[data-ffv13-tab]')) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.dataset.ffv13Tab = 'calendar';
+      b.textContent = 'Calendario';
+      tabs.appendChild(b);
+    }
+    const tabBtn = tabs?.querySelector('[data-ffv13-tab]');
+    const active = prefs.tab === 'calendar';
+    tabBtn?.classList.toggle('active', active);
+    root.classList.toggle('ffv13-hide-v12', active);
+
+    /* --- panel del calendario --- */
+    let panel = root.querySelector('[data-ffv13-panel]');
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.dataset.ffv13Panel = '1';
+      panel.className = 'ffv13-panel';
+      panel.innerHTML = '<section class="ffv13-section" data-ffv13-cal></section>';
+      root.appendChild(panel);
+    }
+    panel.classList.toggle('active', active);
+    if (active) panel.querySelector('[data-ffv13-cal]').innerHTML = calendarMarkup(data);
+
+    /* --- panel de ROC dentro de la pestaña Resumen --- */
+    const summary = root.querySelector('[data-oi12-view="summary"]');
+    if (summary && !summary.querySelector('[data-ffv13-roc]')) {
+      const sec = document.createElement('section');
+      sec.dataset.ffv13Roc = '1';
+      sec.className = 'ffv13-section';
+      sec.innerHTML = rocPanelMarkup(data, cycles);
+      const anchor = summary.querySelector('.oi12-summary');
