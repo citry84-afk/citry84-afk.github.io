@@ -1,0 +1,22 @@
+name: Opciones v14.1 checks
+on:
+  push:
+    paths:
+      - 'mi-plan/options-v14-1.js'
+      - 'mi-plan/tests/options-v14-1.test.mjs'
+      - '.github/workflows/options-v14-1.yml'
+  pull_request:
+    paths:
+      - 'mi-plan/options-v14-1.js'
+      - 'mi-plan/tests/options-v14-1.test.mjs'
+      - '.github/workflows/options-v14-1.yml'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check mi-plan/options-v14-1.js
+      - run: node --test mi-plan/tests/options-v14-1.test.mjs
