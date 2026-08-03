@@ -1,0 +1,26 @@
+name: Ensamblar Opciones v14
+on:
+  push:
+    paths:
+      - '.github/workflows/build-options-v14.yml'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Crear y validar motor único
+        run: |
+          cat .build/options-v14/chunk-* | base64 -d | gzip -d > mi-plan/options-v14.js
+          node --check mi-plan/options-v14.js
+          test "$(wc -c < mi-plan/options-v14.js)" -eq 63106
+      - name: Publicar y limpiar temporales
+        run: |
+          rm -rf .build/options-v14
+          rm -f .github/workflows/build-options-v14.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'feat: publicar motor único de opciones v14'
+          git push
