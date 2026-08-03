@@ -1,0 +1,31 @@
+/* ================================================================
+   8. CONSOLA DE SEGURIDAD
+   ================================================================ */
+window.FFv13 = {
+  version: 13,
+  data: () => currentData(),
+  cycles: () => buildCycles(currentData()),
+  roc: () => capitalWeightedRoc(buildCycles(currentData())),
+  daily: () => dailySeries(currentData()),
+  backup: () => readJSON(BACKUP),
+  restore() {                                   // vuelve al estado previo a la primera fusión
+    const b = readJSON(BACKUP);
+    if (!b) return 'No hay copia de seguridad guardada.';
+    saveJSON(STORE, b);
+    rerenderV12();
+    return 'Restaurado el estado anterior a v13.';
+  },
+  export() {                                    // descarga todo el histórico en JSON
+    const blob = new Blob([JSON.stringify(currentData(), null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `opciones-historico-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    return 'Descargando histórico.';
+  },
+  _internals: { parseCSV, readReport, mergeTrades, splitContractCycles, buildCycles, capitalWeightedRoc, dailySeries, importCSV }
+};
+
+watch();
+})();
