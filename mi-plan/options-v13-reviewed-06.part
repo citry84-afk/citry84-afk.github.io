@@ -1,0 +1,69 @@
+  const openRows = openPuts.length ? openPuts
+    .sort((a, b) => (b.plannedRoc ?? 0) - (a.plannedRoc ?? 0))
+    .map(c => {
+      const exp = parseExpiry(c.expiry);
+      const dte = exp ? Math.max(0, Math.ceil((exp - new Date()) / 86400000)) : null;
+      return `<div class="ffv13-row">
+        <span class="ffv13-tick">${esc(c.underlying.slice(0, 5))}</span>
+        <div><b>${esc(c.expiry)} · ${esc(String(c.strike))}P</b>
+          <small>${money(c.capital, true, c.currency)} comprometidos · ${dte === null ? '—' : dte + ' días'}</small></div>
+        <div class="ffv13-rocval"><b class="${(c.plannedRoc ?? 0) >= 0 ? 'good' : 'bad'}">${c.plannedRoc === null ? '—' : pct(c.plannedRoc)}</b><small>ROC anual. previsto</small></div>
+      </div>`;
+    }).join('')
+    : '<div class="ffv13-row muted"><div><b>No hay puts vendidas abiertas</b><small>Sin capital comprometido ahora mismo.</small></div></div>';
+
+  const bestRows = bestList.length ? bestList.map(c => `<div class="ffv13-row">
+      <span class="ffv13-tick">${esc(c.underlying.slice(0, 5))}</span>
+      <div><b>${esc(c.expiry)} · ${esc(String(c.strike))}${esc(c.right)}</b>
+        <small>${c.heldDays} días · ${money(c.pnl, false, c.currency)}</small></div>
+      <div class="ffv13-rocval"><b class="${(c.rocAnn ?? 0) >= 0 ? 'good' : 'bad'}">${c.rocAnn === null ? '—' : pct(c.rocAnn)}</b><small>ROC anualizado</small></div>
+    </div>`).join('')
+    : '<div class="ffv13-row muted"><div><b>Todavía no hay ciclos cerrados</b><small>Aparecerán al cerrar o vencer la primera put.</small></div></div>';
+
+  return `
+  <div class="ffv13-cardhead ffv13-panelhead">
+    <div><h3>ROC cash-secured sobre capital comprometido</h3>
+      <p>Rentabilidad sobre strike × contratos × 100. Es una medida conservadora y no equivale al margen real de IBKR.</p></div>
+  </div>
+  <div class="ffv13-kpis">
+    <div class="ffv13-kpi"><span>ROC cash-secured anualizado</span>
+      <b class="${(agg.annualised ?? 0) >= 0 ? 'good' : 'bad'}">${agg.annualised === null ? '—' : pct(agg.annualised)}</b>
+      <small>Solo puts vendidas completadas; ponderado por capital y días</small></div>
+    <div class="ffv13-kpi"><span>Prima media por ciclo</span>
+      <b>${agg.avgPremiumPct === null ? '—' : pct(agg.avgPremiumPct, 2)}</b>
+      <small>Crédito neto sobre el strike comprometido</small></div>
+    <div class="ffv13-kpi"><span>Capital·año empleado</span>
+      <b>${money(agg.capitalYears, true)}</b>
+      <small>Equivalente a un año con ese capital bloqueado</small></div>
+    <div class="ffv13-kpi"><span>Ciclos medidos</span>
+      <b>${agg.count}</b>
+      <small>Con strike y capital identificables</small></div>
+  </div>
+  <div class="ffv13-two">
+    <div><div class="ffv13-sub">Capital comprometido ahora</div>${openRows}</div>
+    <div><div class="ffv13-sub">Mejores ciclos cerrados</div>${bestRows}</div>
+  </div>`;
+}
+
+/* ================================================================
+   5. ESTILOS
+   ================================================================ */
+function injectStyles() {
+  if (document.querySelector('style[data-ffv13]')) return;
+  const s = document.createElement('style');
+  s.dataset.ffv13 = '1';
+  s.textContent = `
+.ffv13{--line:#203651;--muted:#91a5bf;--good:#35d0a1;--bad:#ff6574}
+.ffv13 .good{color:var(--good)}.ffv13 .bad{color:var(--bad)}
+.ffv13-panel{display:none;gap:14px}
+.ffv13-panel.active{display:grid}
+.ffv13-section{padding:18px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,rgba(15,32,55,.98),rgba(8,21,37,.98));color:#f6f9ff}
+.ffv13-section *{box-sizing:border-box}
+.ffv13-cardhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}
+.ffv13-cardhead b{font-size:14px}
+.ffv13-panelhead h3{margin:0 0 4px;font-size:17px;letter-spacing:-.02em}
+.ffv13-panelhead p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
+.ffv13-calhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.ffv13-calhead h3{margin:0 0 4px;font-size:17px;letter-spacing:-.02em}
+.ffv13-calhead p{margin:0;color:var(--muted);font-size:12px}
+.ffv13-years{display:flex;gap:5px}
