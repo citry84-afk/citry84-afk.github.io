@@ -13,7 +13,8 @@ function load(){
   class Blob{constructor(parts,opts){this.parts=parts;this.opts=opts}}
   const context={console,localStorage,document,window,MutationObserver,Blob,URL:{createObjectURL(){return'blob:x'},revokeObjectURL(){}},navigator:{},Intl,Date,Math,Number,String,Map,Set,Array,Object,RegExp,JSON,setTimeout(){return 1},clearTimeout(){},alert(){},CSS:{escape:s=>s},CustomEvent:function(){}};
   vm.createContext(context);
-  const source=[1,2,3,4].map(i=>fs.readFileSync(new URL(`../_options-v14/options-v14-0${i}.inc`,import.meta.url),'utf8')).join('');
+  const files=['01','02','02b','03','04'];
+  const source=files.map(name=>fs.readFileSync(new URL(`../_options-v14/options-v14-${name}.inc`,import.meta.url),'utf8')).join('');
   vm.runInContext(source,context);
   return context.window.FFv14;
 }
