@@ -1,0 +1,81 @@
+  const open = replaceOpenSnapshot ? incoming.open : (current.open || []);
+
+  const next = {
+    ...current,
+    trades: merged.trades,
+    open,
+    openAsOf: replaceOpenSnapshot ? new Date().toISOString() : (current.openAsOf || null),
+    events: merged.trades.filter(t => /(?:^|;)(?:A|Ep|Ex)(?:;|$)/.test(String(t.code || ''))),
+    imports: [...(current.imports || []), {
+      name: fileName, date: new Date().toISOString(), rows: rows.length,
+      tradesInFile: incoming.trades.length, added: merged.added, skipped: merged.skipped,
+      openCount: incoming.open.length, replacedOpenSnapshot: replaceOpenSnapshot
+    }].slice(-24)
+  };
+  next.summary = recomputeSummary(next, fileName, rows.length);
+  saveJSON(STORE, next);
+  return { data: next, added: merged.added, skipped: merged.skipped, rows: rows.length,
+           tradesInFile: incoming.trades.length, openCount: incoming.open.length,
+           replacedOpenSnapshot: replaceOpenSnapshot };
+}
+
+/* ================================================================
+   2. CICLOS Y ROC ANUALIZADO
+   ================================================================ */
+function splitContractCycles(trades) {
+  const sorted = [...trades].sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const segments = [];
+  let current = [], running = 0;
+  for (const trade of sorted) {
+    if (!current.length) running = 0;
+    current.push(trade);
+    running += number(trade.quantity);
+    if (Math.abs(running) < 1e-9) {
+      segments.push(current);
+      current = [];
+      running = 0;
+    }
+  }
+  if (current.length) segments.push(current);
+  return segments;
+}
+
+function buildCycles(data) {
+  const by = groupBy((data.trades || []).filter(t => t.right), contractKey);
+  const openMap = new Map((data.open || []).map(p => [contractKey(p), p]));
+  const cycles = [];
+
+  Object.entries(by).forEach(([key, allTrades]) => {
+    const segments = splitContractCycles(allTrades);
+    segments.forEach((segment, index) => {
+      const trades = [...segment].sort((a, b) => String(a.date).localeCompare(String(b.date)));
+      const first = trades[0], last = trades.at(-1);
+      const isLast = index === segments.length - 1;
+      const position = isLast ? openMap.get(key) : null;
+      const assigned  = trades.some(t => String(t.code).split(';').includes('A'));
+      const expired   = trades.some(t => String(t.code).split(';').includes('Ep'));
+      const exercised = trades.some(t => String(t.code).split(';').includes('Ex'));
+      const opens = trades.filter(t => String(t.code).split(';').includes('O'));
+      const closes = trades.filter(t => String(t.code).split(';').includes('C'));
+      const status = position ? 'open' : assigned ? 'assigned' : expired ? 'expired' : exercised ? 'exercised'
+                   : (opens.length && closes.length) ? 'closed' : 'partial';
+
+      let running = 0, maxExposure = 0;
+      trades.forEach(t => { running += number(t.quantity); maxExposure = Math.max(maxExposure, Math.abs(running)); });
+      const contracts = Math.max(1, maxExposure || Math.max(...trades.map(t => Math.abs(number(t.quantity))), 1));
+      const shortPut = first.right === 'P' && (
+        opens.some(t => number(t.quantity) < 0) ||
+        (position && number(position.quantity) < 0) ||
+        closes.some(t => number(t.quantity) > 0)
+      );
+      const netCredit = opens.filter(t => number(t.quantity) < 0)
+        .reduce((sum, t) => sum + number(t.proceeds) + number(t.commission), 0);
+      const realized = trades.reduce((sum, t) => sum + number(t.realized), 0);
+      const start = parseDate(first.date), end = parseDate(last.date), exp = parseExpiry(first.expiry);
+      const today = new Date();
+      const heldDays = start ? Math.max(1, daysBetween(start, status === 'open' ? today : (end || today))) : 1;
+      const dteAtOpen = start && exp ? Math.max(1, daysBetween(start, exp)) : null;
+      const multiplier = position?.multiplier || 100;
+      const capital = shortPut ? Math.abs(number(first.strike)) * contracts * multiplier : 0;
+      const unrealized = position ? number(position.unrealized) : 0;
+      const pnl = status === 'open' ? realized + unrealized : realized;
