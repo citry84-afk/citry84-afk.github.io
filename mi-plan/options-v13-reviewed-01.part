@@ -1,0 +1,75 @@
+/* FinanzasFácil · Opciones v13.1 — capa aditiva revisada sobre options-intuitive-v12.js
+   No sustituye a v12: lo envuelve. Si este fichero falla, v12 sigue funcionando.
+   Aporta:
+     1. Importación acumulativa con deduplicación (deja de machacar el histórico)
+     2. ROC anualizado sobre capital comprometido
+     3. Calendario de P&L (mes a mes y día a día)
+*/
+(() => {
+'use strict';
+if (window.__FF_OPTIONS_V13__) return;
+window.__FF_OPTIONS_V13__ = true;
+
+/* ---------- claves de almacenamiento ---------- */
+const STORE   = 'ff_options_safe_v9';        // la misma que v12: no se rompe compatibilidad
+const V12PREF = 'ff_options_v12_prefs';
+const PREFS   = 'ff_options_v13_prefs';
+const BACKUP  = 'ff_options_v13_backup';     // copia de seguridad previa a la primera fusión
+
+/* ---------- utilidades ---------- */
+const readJSON  = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (_) { return null; } };
+const saveJSON  = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} };
+const number    = v => { const n = Number(String(v ?? '').replace(',', '.')); return Number.isFinite(n) ? n : 0; };
+const esc       = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const datePart  = v => String(v || '').slice(0, 10);
+const money     = (v, compact = false, currency = 'USD') =>
+  new Intl.NumberFormat('es-ES', { style: 'currency', currency, maximumFractionDigits: 0, notation: compact ? 'compact' : 'standard' }).format(Number(v) || 0);
+const pct       = (v, d = 1) => `${new Intl.NumberFormat('es-ES', { maximumFractionDigits: d }).format(Number(v) || 0)}%`;
+const MONTHS    = { JAN:0, FEB:1, MAR:2, APR:3, MAY:4, JUN:5, JUL:6, AUG:7, SEP:8, OCT:9, NOV:10, DEC:11 };
+const MONTH_ES  = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+const parseDate   = v => { const d = new Date(datePart(v) + 'T12:00:00'); return Number.isNaN(d.getTime()) ? null : d; };
+const parseExpiry = code => { const m = String(code || '').toUpperCase().match(/^(\d{2})([A-Z]{3})(\d{2})$/); return m ? new Date(2000 + Number(m[3]), MONTHS[m[2]], Number(m[1]), 12) : null; };
+const daysBetween = (a, b) => Math.round((b - a) / 86400000);
+const contractKey = t => [t.underlying, t.expiry, t.strike, t.right].join('|');
+
+let prefs = { tab: 'none', calMonth: '', ...(readJSON(PREFS) || {}) };
+const savePrefs = () => saveJSON(PREFS, prefs);
+
+/* ================================================================
+   1. LECTURA DE CSV Y FUSIÓN CON DEDUPLICACIÓN
+   ================================================================ */
+function parseCSV(text) {
+  const out = []; let row = [], field = '', quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+      else if (c === '"') quoted = false;
+      else field += c;
+    } else {
+      if (c === '"') quoted = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n') { row.push(field.replace(/\r$/, '')); out.push(row); row = []; field = ''; }
+      else field += c;
+    }
+  }
+  if (field || row.length) { row.push(field); out.push(row); }
+  return out;
+}
+
+function symbolParts(symbol) {
+  const m = String(symbol || '').match(/^([A-Z0-9.]+)\s+(\d{2}[A-Z]{3}\d{2})\s+([\d.]+)\s+([PC])$/);
+  return m ? { underlying: m[1], expiry: m[2], strike: number(m[3]), right: m[4] }
+           : { underlying: String(symbol || ''), expiry: '', strike: 0, right: '' };
+}
+
+/* Mismo lector de secciones que v12, añadiendo una señal para saber si el
+   extracto contiene una fotografía de posiciones. Así podemos distinguir
+   "cero posiciones abiertas" de "este informe no incluye esa sección". */
+function readReport(rows) {
+  const open = [], trades = [];
+  let sawOpenPositionsSection = false;
+  for (const r of rows) {
+    if (r[0] === 'Posiciones abiertas') sawOpenPositionsSection = true;
+    if (r[0] === 'Posiciones abiertas' && r[1] === 'Data' && String(r[3]).includes('Opciones')) {
+      const p = symbolParts(r[5]);
