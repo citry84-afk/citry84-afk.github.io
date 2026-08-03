@@ -1,0 +1,80 @@
+    monthDays.push({ d, key, ...(daily[key] || { pnl: 0, trades: 0 }) });
+  }
+  const maxDay = Math.max(1, ...monthDays.map(x => Math.abs(x.pnl)));
+  const cells = [
+    ...Array.from({ length: lead }, () => '<i class="ffv13-day pad"></i>'),
+    ...monthDays.map(x => `<i class="ffv13-day ${heatClass(x.pnl, maxDay)}" title="${x.key}: ${money(x.pnl)} · ${x.trades} operaciones">
+        <b>${x.d}</b>${x.trades ? `<s>${money(x.pnl, true)}</s>` : ''}</i>`)
+  ].join('');
+
+  const monthPnl = monthDays.reduce((s, x) => s + x.pnl, 0);
+  const monthTradeCount = monthDays.reduce((s, x) => s + x.trades, 0);
+  const best = monthDays.filter(x => x.trades).sort((a, b) => b.pnl - a.pnl)[0];
+  const worst = monthDays.filter(x => x.trades).sort((a, b) => a.pnl - b.pnl)[0];
+  const greenDays = monthDays.filter(x => x.trades && x.pnl > 0).length;
+  const activeDays = monthDays.filter(x => x.trades).length;
+
+  const tickers = {};
+  monthDays.forEach(x => Object.entries(daily[x.key]?.tickers || {}).forEach(([k, v]) => tickers[k] = (tickers[k] || 0) + v));
+  const tickerRows = Object.entries(tickers).sort((a, b) => b[1] - a[1]).slice(0, 8)
+    .map(([k, v]) => `<div class="ffv13-ticker"><span>${esc(k)}</span><b class="${v >= 0 ? 'good' : 'bad'}">${money(v)}</b></div>`).join('')
+    || '<div class="ffv13-ticker muted"><span>Sin movimientos este mes</span></div>';
+
+  const years = [...new Set(days.map(d => d.slice(0, 4)))].sort();
+
+  return `
+  <div class="ffv13-calhead">
+    <div>
+      <h3>Calendario de resultados</h3>
+      <p>P&amp;L realizado por día, tal y como lo informa el extracto.</p>
+    </div>
+    <div class="ffv13-years">
+      ${years.map(yy => `<button type="button" class="ffv13-year ${Number(yy) === year ? 'sel' : ''}" data-ffv13-month="${yy}-${String(monthIdx + 1).padStart(2, '0')}">${yy}</button>`).join('')}
+    </div>
+  </div>
+
+  <div class="ffv13-yearbar">
+    <div class="ffv13-yeartotal">
+      <span>Total ${year}</span>
+      <b class="${yearPnl >= 0 ? 'good' : 'bad'}">${money(yearPnl)}</b>
+      <small>${yearTrades} operaciones</small>
+    </div>
+    <div class="ffv13-months">${monthCells}</div>
+  </div>
+
+  <div class="ffv13-monthgrid">
+    <div class="ffv13-card">
+      <div class="ffv13-cardhead">
+        <b>${MONTH_ES[monthIdx]} ${year}</b>
+        <span class="${monthPnl >= 0 ? 'good' : 'bad'}">${money(monthPnl)}</span>
+      </div>
+      <div class="ffv13-dows">${['L','M','X','J','V','S','D'].map(d => `<span>${d}</span>`).join('')}</div>
+      <div class="ffv13-days">${cells}</div>
+      <div class="ffv13-legend">
+        <span>Pérdida</span><i class="ffv13-day down3"></i><i class="ffv13-day down1"></i><i class="ffv13-day zero"></i><i class="ffv13-day up1"></i><i class="ffv13-day up3"></i><span>Ganancia</span>
+      </div>
+    </div>
+    <div class="ffv13-card">
+      <div class="ffv13-cardhead"><b>Resumen del mes</b></div>
+      <div class="ffv13-stats">
+        <div><span>Días con actividad</span><b>${activeDays}</b></div>
+        <div><span>Días en verde</span><b>${activeDays ? `${greenDays} (${pct(greenDays / activeDays * 100, 0)})` : '—'}</b></div>
+        <div><span>Mejor día</span><b class="good">${best ? money(best.pnl) : '—'}</b></div>
+        <div><span>Peor día</span><b class="bad">${worst ? money(worst.pnl) : '—'}</b></div>
+        <div><span>Operaciones</span><b>${monthTradeCount}</b></div>
+      </div>
+      <div class="ffv13-cardhead" style="margin-top:14px"><b>Por subyacente</b></div>
+      <div class="ffv13-tickers">${tickerRows}</div>
+    </div>
+  </div>`;
+}
+
+/* ================================================================
+   4. PANEL DE ROC (se inserta en la pestaña Resumen)
+   ================================================================ */
+function rocPanelMarkup(data, cycles) {
+  const agg = capitalWeightedRoc(cycles);
+  const openPuts = cycles.filter(c => c.status === 'open' && c.isShortPut && c.structure !== 'box');
+  const closed = cycles.filter(c => c.isShortPut && !['open', 'partial'].includes(c.status) && c.structure !== 'box' && c.capital > 0);
+  const bestList = [...closed].sort((a, b) => (b.rocAnn ?? -1e9) - (a.rocAnn ?? -1e9)).slice(0, 4);
+
