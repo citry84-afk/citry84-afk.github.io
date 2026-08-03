@@ -1,0 +1,28 @@
+name: Mi Plan v15
+
+on:
+  push:
+    paths:
+      - 'mi-plan/v15-core.js'
+      - 'mi-plan/v15-ui.js'
+      - 'mi-plan/safe-loader-v15.js'
+      - 'mi-plan/v15.html'
+      - 'mi-plan/tests/v15-core.test.mjs'
+      - '.github/workflows/v15.yml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax
+        run: |
+          node --check mi-plan/v15-core.js
+          node --check mi-plan/v15-ui.js
+          node --check mi-plan/safe-loader-v15.js
+      - name: Tests
+        run: node --test mi-plan/tests/v15-core.test.mjs
