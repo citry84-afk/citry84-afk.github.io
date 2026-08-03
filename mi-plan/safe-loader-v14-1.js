@@ -25,6 +25,7 @@
     try{
       await loadScript('./options-v14.js?v=14');
       await loadScript('./options-v14-1.js?v=14.1');
+      document.querySelector('.oi12-tabs [data-oi12-tab].active, .oi12-tabs [data-ffv14-tab].active')?.click();
     }catch(error){console.warn('[ffv14.1] La capa avanzada no se cargó; v12 continúa disponible.',error)}
   }catch(error){
     console.error(error);removeLegacy();const notice=document.createElement('div');notice.style.cssText='position:fixed;left:18px;right:18px;bottom:88px;z-index:9999;padding:14px 16px;border-radius:17px;background:#082a5c;color:white;font:700 14px system-ui;box-shadow:0 15px 45px #082a5c44';notice.innerHTML='<button type="button" aria-label="Cerrar" style="float:right;border:0;background:transparent;color:white;font-size:22px">×</button>No se pudo cargar una parte visual. Puedes cerrar este aviso y seguir usando Mi Plan.';notice.querySelector('button').onclick=()=>notice.remove();document.body.appendChild(notice)
