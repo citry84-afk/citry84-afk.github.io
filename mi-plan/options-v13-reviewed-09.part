@@ -1,0 +1,108 @@
+      if (anchor && anchor.nextSibling) summary.insertBefore(sec, anchor.nextSibling);
+      else summary.appendChild(sec);
+    }
+
+    /* --- ROC en cada tarjeta de v12. Si el mismo contrato se abrió dos veces,
+       v12 lo agrupa en una tarjeta; aquí evitamos mostrar un ROC falso. --- */
+    const byKey = groupBy(cycles, c => c.key);
+    root.querySelectorAll('.oi12-cycle[data-cycle-id]').forEach(card => {
+      if (card.querySelector('.ffv13-roc')) return;
+      const list = byKey[card.dataset.cycleId] || [];
+      const measurable = list.filter(c => c.isShortPut && c.capital > 0 && c.rocAnn !== null);
+      if (!measurable.length) return;
+      const holder = card.querySelector('.oi12-cycle-name > div');
+      if (!holder) return;
+      const tag = document.createElement('small');
+      tag.className = 'ffv13-roc';
+      if (measurable.length === 1) {
+        const c = measurable[0];
+        tag.textContent = `ROC cash-secured anual. ${pct(c.rocAnn)} · ${money(c.capital, true, c.currency)}`;
+      } else {
+        const agg = capitalWeightedRoc(measurable);
+        tag.textContent = `${measurable.length} ciclos detectados · ROC ponderado ${agg.annualised === null ? '—' : pct(agg.annualised)}`;
+      }
+      holder.appendChild(tag);
+    });
+  } catch (err) {
+    console.error('[ffv13] fallo al inyectar, v12 sigue operativo:', err);
+  } finally {
+    injecting = false;
+  }
+}
+
+/* Reobservar: v12 reconstruye #viewRoot entero en cada render */
+function watch() {
+  const host = document.querySelector('#viewRoot');
+  if (!host) { setTimeout(watch, 400); return; }
+  const obs = new MutationObserver(() => {
+    if (injecting) return;
+    if (document.querySelector('#viewRoot .oi12')) inject();
+  });
+  obs.observe(host, { childList: true, subtree: true });
+  if (document.querySelector('#viewRoot .oi12')) inject();
+}
+
+/* Fuerza un re-render de v12 pulsando su pestaña activa */
+function rerenderV12() {
+  const btn = document.querySelector('.oi12-tabs [data-oi12-tab].active')
+           || document.querySelector('.oi12-tabs [data-oi12-tab]');
+  btn?.click();
+}
+
+/* ================================================================
+   7. EVENTOS
+   ================================================================ */
+/* Importación: interceptamos en fase de captura para que el manejador de v12
+   (que sobrescribe el histórico) no llegue a ejecutarse. */
+document.addEventListener('change', async e => {
+  const input = e.target;
+  if (!input || !input.matches?.('[data-oi12-file]')) return;
+  e.stopImmediatePropagation();
+  e.stopPropagation();
+  const file = input.files?.[0];
+  if (!file) return;
+  toast('Leyendo el extracto y fusionando con el histórico…');
+  try {
+    const text = await file.text();
+    const res = importCSV(text, file.name);
+    input.value = '';
+    prefs.calMonth = '';
+    savePrefs();
+    rerenderV12();
+    setTimeout(inject, 60);
+    const positionsText = res.replacedOpenSnapshot
+      ? `${res.openCount} posiciones abiertas en la foto actual`
+      : 'la foto de posiciones anterior se ha conservado';
+    toast(res.added
+      ? `${res.added} operaciones nuevas · ${res.skipped} ya estaban · ${positionsText}`
+      : `Sin operaciones nuevas · ${positionsText}`);
+  } catch (err) {
+    console.error(err);
+    input.value = '';
+    toast('No se pudo leer el CSV. Revisa que sea el informe de actividad de IBKR.');
+  }
+}, true);
+
+document.addEventListener('click', e => {
+  const calTab = e.target.closest?.('[data-ffv13-tab]');
+  if (calTab) {
+    prefs.tab = prefs.tab === 'calendar' ? 'none' : 'calendar';
+    savePrefs();
+    document.querySelectorAll('.oi12-tabs [data-oi12-tab]').forEach(b => b.classList.remove('active'));
+    inject();
+    if (prefs.tab === 'none') rerenderV12();
+    return;
+  }
+  if (e.target.closest?.('[data-oi12-tab]')) {           // el usuario vuelve a una pestaña de v12
+    if (prefs.tab !== 'none') { prefs.tab = 'none'; savePrefs(); }
+    setTimeout(inject, 0);
+    return;
+  }
+  const month = e.target.closest?.('[data-ffv13-month]');
+  if (month) {
+    prefs.calMonth = month.dataset.ffv13Month;
+    savePrefs();
+    inject();
+  }
+});
+
