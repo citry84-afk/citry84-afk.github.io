@@ -1,0 +1,85 @@
+      open.push({ ...p, symbol: r[5], currency: r[4] || 'USD', quantity: number(r[6]), multiplier: number(r[7]) || 100,
+                  costPrice: number(r[8]), costBasis: number(r[9]), closePrice: number(r[10]), value: number(r[11]),
+                  unrealized: number(r[12]), structure: '' });
+    }
+    if (r[0] === 'Operaciones' && r[1] === 'Data' && String(r[3]).includes('Opciones')) {
+      const p = symbolParts(r[5]);
+      trades.push({ ...p, symbol: r[5], currency: r[4] || 'USD', date: r[6], quantity: number(r[7]), price: number(r[8]),
+                    closePrice: number(r[9]), proceeds: number(r[10]), commission: number(r[11]), basis: number(r[12]),
+                    realized: number(r[13]), mtm: number(r[14]), code: r[15] || '' });
+    }
+  }
+  return { open, trades, sawOpenPositionsSection };
+}
+
+/* Huella de una operación. No incluye el fichero de origen a propósito:
+   la misma operación en dos extractos solapados debe colapsar en una. */
+const tradeFingerprint = t => [
+  t.symbol, datePart(t.date), t.quantity, t.price, t.proceeds, t.commission, t.realized, t.code
+].join('|');
+
+const groupBy = (list, fn) => list.reduce((acc, x) => { (acc[fn(x)] ??= []).push(x); return acc; }, {});
+
+/* Fusión por multiconjunto: si el CSV nuevo trae 3 ocurrencias de una huella
+   y ya había 3, no se duplica; si trae 4, se añade la que faltaba.
+   Reimportar el mismo fichero es idempotente. */
+function mergeTrades(existing, incoming) {
+  const ge = groupBy(existing || [], tradeFingerprint);
+  const gi = groupBy(incoming || [], tradeFingerprint);
+  const out = [];
+  let added = 0, skipped = 0;
+  new Set([...Object.keys(ge), ...Object.keys(gi)]).forEach(k => {
+    const a = ge[k] || [], b = gi[k] || [];
+    if (b.length > a.length) { out.push(...a, ...b.slice(a.length)); added += b.length - a.length; skipped += a.length; }
+    else { out.push(...a); skipped += b.length; }
+  });
+  out.sort((x, y) => String(x.date).localeCompare(String(y.date)));
+  return { trades: out, added, skipped };
+}
+
+function detectBoxes(open) {
+  const groups = groupBy(open, p => p.underlying + '|' + p.expiry);
+  const boxes = [];
+  Object.values(groups).forEach(g => {
+    const strikes = [...new Set(g.map(x => x.strike))].sort((a, b) => a - b);
+    if (strikes.length !== 2) return;
+    const legs = [];
+    strikes.forEach(s => ['C', 'P'].forEach(r => {
+      const leg = g.find(x => x.strike === s && x.right === r && !legs.includes(x));
+      if (leg) legs.push(leg);
+    }));
+    if (legs.length === 4) {
+      legs.forEach(x => x.structure = 'box');
+      boxes.push({ id: 'box|' + g[0].underlying + '|' + g[0].expiry, underlying: g[0].underlying, expiry: g[0].expiry, strikes, legs });
+    }
+  });
+  return boxes;
+}
+
+function recomputeSummary(data, fileName, rowCount) {
+  const open = data.open || [], trades = data.trades || [];
+  const boxes = detectBoxes(open);
+  const naked = open.filter(x => x.right === 'P' && x.quantity < 0 && x.structure !== 'box');
+  return {
+    file: fileName, rows: rowCount, openCount: open.length, tradeCount: trades.length,
+    boxes: boxes.length, nakedPuts: naked.length,
+    assignmentExposure: naked.reduce((s, x) => s + x.strike * Math.abs(x.quantity) * (x.multiplier || 100), 0),
+    realized: trades.reduce((s, x) => s + x.realized, 0),
+    unrealized: open.reduce((s, x) => s + x.unrealized, 0),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function importCSV(text, fileName) {
+  const rows = parseCSV(text);
+  const incoming = readReport(rows);
+  if (!incoming.trades.length && !incoming.open.length) throw new Error('El fichero no contiene secciones de opciones reconocibles.');
+
+  const current = readJSON(STORE) || {};
+  if (!localStorage.getItem(BACKUP) && localStorage.getItem(STORE)) saveJSON(BACKUP, current); // red de seguridad, una sola vez
+
+  const merged = mergeTrades(current.trades || [], incoming.trades);
+  // Si el informe incluye la sección de posiciones, esa sección es la fotografía
+  // actual y puede contener cero opciones. Solo conservamos la foto anterior cuando
+  // el fichero no incluye posiciones abiertas en absoluto (p. ej. un Flex parcial).
+  const replaceOpenSnapshot = incoming.sawOpenPositionsSection;
