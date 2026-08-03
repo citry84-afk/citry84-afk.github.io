@@ -1,0 +1,94 @@
+      const rocPct = capital ? (pnl / capital) * 100 : null;
+      const rocAnn = rocPct === null ? null : rocPct * (365 / heldDays);
+      const plannedRoc = (capital && dteAtOpen && netCredit) ? (netCredit / capital) * 100 * (365 / dteAtOpen) : null;
+      cycles.push({
+        id: segments.length === 1 ? key : `${key}#${index + 1}`,
+        key, sequence: index + 1, sequenceCount: segments.length,
+        underlying: first.underlying, expiry: first.expiry, strike: first.strike, right: first.right,
+        currency: first.currency || 'USD', status, contracts, netCredit, realized, unrealized, pnl,
+        capital, heldDays, dteAtOpen, rocPct, rocAnn, plannedRoc,
+        start: first.date, end: last.date, isPut: first.right === 'P', isShortPut: shortPut,
+        structure: position?.structure || '', trades
+      });
+    });
+  });
+  return cycles;
+}
+
+/* ROC cash-secured agregado, ponderado por capital y tiempo. Se calcula solo
+   con ciclos de puts vendidas ya terminados. No representa el margen real de IBKR. */
+function capitalWeightedRoc(cycles) {
+  let pnl = 0, capitalYears = 0, credits = 0, capitalSum = 0, n = 0;
+  cycles.filter(c => c.isShortPut && c.structure !== 'box' && c.capital > 0 && !['open','partial'].includes(c.status)).forEach(c => {
+    pnl += c.pnl;
+    capitalYears += c.capital * (c.heldDays / 365);
+    credits += c.netCredit;
+    capitalSum += c.capital;
+    n++;
+  });
+  return { pnl, capitalYears, annualised: capitalYears ? (pnl / capitalYears) * 100 : null,
+           credits, capitalSum, count: n,
+           avgPremiumPct: capitalSum ? (credits / capitalSum) * 100 : null };
+}
+
+/* ================================================================
+   3. CALENDARIO DE P&L
+   ================================================================ */
+function dailySeries(data) {
+  const map = {};
+  (data.trades || []).forEach(t => {
+    const d = datePart(t.date);
+    if (!d || d.length !== 10) return;
+    (map[d] ??= { pnl: 0, trades: 0, tickers: {} });
+    map[d].pnl += number(t.realized);
+    map[d].trades += 1;
+    map[d].tickers[t.underlying] = (map[d].tickers[t.underlying] || 0) + number(t.realized);
+  });
+  return map;
+}
+
+function monthTotals(daily, year) {
+  const out = Array.from({ length: 12 }, () => ({ pnl: 0, trades: 0 }));
+  Object.entries(daily).forEach(([d, v]) => {
+    if (Number(d.slice(0, 4)) !== year) return;
+    const m = Number(d.slice(5, 7)) - 1;
+    out[m].pnl += v.pnl; out[m].trades += v.trades;
+  });
+  return out;
+}
+
+function heatClass(v, scale) {
+  if (!v) return 'zero';
+  const r = Math.min(1, Math.abs(v) / (scale || 1));
+  const step = r > .66 ? 3 : r > .33 ? 2 : 1;
+  return (v > 0 ? 'up' : 'down') + step;
+}
+
+function calendarMarkup(data) {
+  const daily = dailySeries(data);
+  const days = Object.keys(daily).sort();
+  if (!days.length) {
+    return `<div class="ffv13-empty"><b>Aún no hay operaciones cargadas</b>
+      <small>Importa un CSV de Interactive Brokers y el calendario se construye solo.</small></div>`;
+  }
+  const current = /^\d{4}-\d{2}$/.test(prefs.calMonth || '') ? prefs.calMonth : days.at(-1).slice(0, 7);
+  const [y, m] = current.split('-').map(Number);
+  const year = y, monthIdx = m - 1;
+
+  const totals = monthTotals(daily, year);
+  const yearPnl = totals.reduce((s, t) => s + t.pnl, 0);
+  const yearTrades = totals.reduce((s, t) => s + t.trades, 0);
+  const maxMonth = Math.max(1, ...totals.map(t => Math.abs(t.pnl)));
+
+  const monthCells = totals.map((t, i) => `
+    <button type="button" class="ffv13-month ${heatClass(t.pnl, maxMonth)} ${i === monthIdx ? 'sel' : ''}" data-ffv13-month="${year}-${String(i + 1).padStart(2, '0')}">
+      <span>${MONTH_ES[i]}</span><b>${t.trades ? money(t.pnl, true) : '—'}</b><small>${t.trades ? t.trades + 't' : ''}</small>
+    </button>`).join('');
+
+  // rejilla del mes seleccionado, semana empezando en lunes
+  const firstDay = new Date(year, monthIdx, 1);
+  const lead = (firstDay.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
+  const monthDays = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = `${year}-${String(monthIdx + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
