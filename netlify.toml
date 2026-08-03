@@ -1,2 +1,8 @@
 [build]
   publish = "."
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/ibkr-flex-sync"
+  to = "/.netlify/functions/ibkr-flex-sync"
+  status = 200
