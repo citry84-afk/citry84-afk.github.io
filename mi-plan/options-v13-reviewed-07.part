@@ -1,0 +1,46 @@
+.ffv13-year{border:1px solid var(--line);border-radius:11px;padding:7px 11px;background:#0d1d31;color:var(--muted);font:900 11px system-ui;cursor:pointer}
+.ffv13-year.sel{background:#17365f;color:#fff;border-color:#32609a}
+.ffv13-yearbar{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;margin-bottom:14px}
+.ffv13-yeartotal{padding:12px;border:1px solid var(--line);border-radius:16px;background:#0b1728}
+.ffv13-yeartotal span{display:block;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.ffv13-yeartotal b{display:block;margin:4px 0 2px;font-size:22px;letter-spacing:-.03em}
+.ffv13-yeartotal small{color:var(--muted);font-size:11px}
+.ffv13-months{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px}
+.ffv13-month{display:grid;gap:1px;padding:8px 4px;border:1px solid var(--line);border-radius:11px;background:#0b1728;color:#f6f9ff;cursor:pointer;text-align:center}
+.ffv13-month span{color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.06em}
+.ffv13-month b{font-size:11px;letter-spacing:-.02em}
+.ffv13-month small{color:var(--muted);font-size:9px}
+.ffv13-month.sel{outline:2px solid #3d87ff;outline-offset:1px}
+.ffv13-monthgrid{display:grid;grid-template-columns:1.25fr .75fr;gap:12px}
+.ffv13-card{padding:14px;border:1px solid var(--line);border-radius:18px;background:#0b1728}
+.ffv13-dows{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-bottom:5px}
+.ffv13-dows span{color:var(--muted);font-size:10px;font-weight:900;text-align:center}
+.ffv13-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.ffv13-day{display:grid;align-content:center;justify-items:center;gap:1px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:#0f2037;font-style:normal}
+.ffv13-day b{font-size:10px;font-weight:800;color:#c3d3e8}
+.ffv13-day s{font-size:9px;font-weight:900;text-decoration:none;color:#fff}
+.ffv13-day.pad{border-color:transparent;background:transparent}
+.ffv13-day.zero{background:#0f2037}
+.ffv13-day.up1{background:rgba(53,208,161,.18);border-color:rgba(53,208,161,.3)}
+.ffv13-day.up2{background:rgba(53,208,161,.36);border-color:rgba(53,208,161,.45)}
+.ffv13-day.up3{background:rgba(53,208,161,.62);border-color:rgba(53,208,161,.7)}
+.ffv13-day.down1{background:rgba(255,101,116,.18);border-color:rgba(255,101,116,.3)}
+.ffv13-day.down2{background:rgba(255,101,116,.36);border-color:rgba(255,101,116,.45)}
+.ffv13-day.down3{background:rgba(255,101,116,.62);border-color:rgba(255,101,116,.7)}
+.ffv13-month.up1{background:rgba(53,208,161,.16)}.ffv13-month.up2{background:rgba(53,208,161,.3)}.ffv13-month.up3{background:rgba(53,208,161,.5)}
+.ffv13-month.down1{background:rgba(255,101,116,.16)}.ffv13-month.down2{background:rgba(255,101,116,.3)}.ffv13-month.down3{background:rgba(255,101,116,.5)}
+.ffv13-legend{display:flex;align-items:center;gap:5px;margin-top:10px;color:var(--muted);font-size:10px}
+.ffv13-legend .ffv13-day{min-height:14px;width:14px}
+.ffv13-stats div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px dashed rgba(32,54,81,.8);font-size:12px}
+.ffv13-stats div:last-child{border-bottom:0}
+.ffv13-stats span{color:var(--muted)}
+.ffv13-tickers{display:grid;gap:4px}
+.ffv13-ticker{display:flex;justify-content:space-between;gap:10px;padding:7px 9px;border-radius:10px;background:#0f2037;font-size:12px;font-weight:800}
+.ffv13-ticker.muted{color:var(--muted);font-weight:600}
+.ffv13-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.ffv13-kpi{padding:13px;border:1px solid var(--line);border-radius:16px;background:#0b1728}
+.ffv13-kpi span{display:block;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.ffv13-kpi b{display:block;margin:6px 0 3px;font-size:23px;letter-spacing:-.04em}
+.ffv13-kpi small{color:var(--muted);font-size:11px;line-height:1.35;display:block}
+.ffv13-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ffv13-sub{margin-bottom:8px;color:#7caeff;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
