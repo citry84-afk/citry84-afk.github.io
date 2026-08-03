@@ -1,0 +1,28 @@
+name: Opciones v14.4 checks
+on:
+  push:
+    paths:
+      - 'mi-plan/options-v14-4-core.js'
+      - 'mi-plan/options-v14-4-ui.js'
+      - 'mi-plan/safe-loader-v14-4.js'
+      - 'mi-plan/tests/options-v14-4.test.mjs'
+      - '.github/workflows/options-v14-4.yml'
+  pull_request:
+    paths:
+      - 'mi-plan/options-v14-4-core.js'
+      - 'mi-plan/options-v14-4-ui.js'
+      - 'mi-plan/safe-loader-v14-4.js'
+      - 'mi-plan/tests/options-v14-4.test.mjs'
+      - '.github/workflows/options-v14-4.yml'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check mi-plan/options-v14-4-core.js
+      - run: node --check mi-plan/options-v14-4-ui.js
+      - run: node --check mi-plan/safe-loader-v14-4.js
+      - run: node --test mi-plan/tests/options-v14-4.test.mjs
