@@ -1,0 +1,90 @@
+      save();renderWizard($('#portraitContent'),property.id);
+    }catch(error){alert(error.message||'No se pudo interpretar el documento.');}
+    finally{wait.remove();}
+  }
+
+  function stepTitle(step, property) {
+    return [
+      ['¿Qué tipo de inmueble es?','Una pregunta cada vez. Puedes volver atrás cuando quieras.'],
+      ['¿Qué parte te pertenece?','Aplicaremos este porcentaje al valor, la hipoteca y el alquiler.'],
+      ['¿Cómo estimamos su valor?','Elige la forma más sencilla para ti.'],
+      ['Selecciona una valoración','No hace falta escribir cifras: usa los selectores o sube un documento.'],
+      ['¿Tiene hipoteca pendiente?','Solo necesitamos saber si existe.'],
+      ['Selecciona los datos de la hipoteca','Puedes usar los selectores o subir un recibo o extracto.'],
+      ['¿Cuánto cobras de alquiler?','Una cifra aproximada mensual es suficiente.'],
+      ['Revisa esta vivienda','Comprueba la fotografía aproximada antes de guardarla.']
+    ][step] || ['Configura el inmueble',''];
+  }
+  function isStepValid(property) {
+    if(property.step===0)return Boolean(property.type);
+    if(property.step===1)return OWNERSHIP.includes(finite(property.ownership));
+    if(property.step===2)return ['known','purchase','document'].includes(property.valueMethod);
+    if(property.step===3)return propertyValue(property)>0;
+    if(property.step===4)return property.mortgage!==null;
+    if(property.step===5)return !property.mortgage||(property.mortgageRemaining>0&&property.mortgageMonthly>0);
+    if(property.step===6)return property.type!=='rented'||property.rentMonthly>0;
+    return propertyValue(property)>0;
+  }
+  function nextStep(property) {
+    let next=property.step+1;
+    if(next===5&&!property.mortgage)next=property.type==='rented'?6:7;
+    if(next===6&&property.type!=='rented')next=7;
+    return Math.min(7,next);
+  }
+  function prevStep(property) {
+    let prev=property.step-1;
+    if(property.step===7&&property.type!=='rented'&&!property.mortgage)prev=4;
+    else if(property.step===7&&property.type!=='rented'&&property.mortgage)prev=5;
+    else if(property.step===7&&property.type==='rented')prev=6;
+    if(property.step===6&&!property.mortgage)prev=4;
+    return Math.max(0,prev);
+  }
+  function stepMarkup(property) {
+    if(property.step===0)return `<div class="pw1512-options"><button class="pw1512-choice ${property.type==='habitual'?'active':''}" data-pw-type="habitual">🏠 Vivienda habitual<small>La casa en la que vives normalmente.</small></button><button class="pw1512-choice ${property.type==='rented'?'active':''}" data-pw-type="rented">🔑 Vivienda alquilada<small>Genera un alquiler mensual.</small></button><button class="pw1512-choice ${property.type==='available'?'active':''}" data-pw-type="available">🌿 Segunda residencia / disponible<small>Uso propio, vacía o disponible.</small></button></div>`;
+    if(property.step===1)return `<div class="pw1512-options two">${OWNERSHIP.map(value=>`<button class="pw1512-choice ${property.ownership===value?'active':''}" data-pw-ownership="${value}">${value} %<small>${value===100?'Solo tuya':value===50?'Compartida a medias':'Propiedad compartida'}</small></button>`).join('')}</div>`;
+    if(property.step===2)return `<div class="pw1512-options"><button class="pw1512-choice ${property.valueMethod==='known'?'active':''}" data-pw-method="known">Sé aproximadamente cuánto vale<small>Escogerás una cifra de una lista.</small></button><button class="pw1512-choice ${property.valueMethod==='purchase'?'active':''}" data-pw-method="purchase">Conozco el precio y el año de compra<small>Calcularemos una referencia aproximada.</small></button><button class="pw1512-choice ${property.valueMethod==='document'?'active':''}" data-pw-method="document">Tengo tasación o pantallazo<small>La app intentará proponerte el valor.</small></button></div>`;
+    if(property.step===3){
+      if(property.valueMethod==='purchase')return `<div class="pw1512-options"><label class="pw1512-select">Precio aproximado de compra<select data-pw-select="purchasePrice">${options(PURCHASE_VALUES,property.purchasePrice||150000)}</select></label><label class="pw1512-select">Año de compra<select data-pw-select="purchaseYear">${yearOptions(property.purchaseYear)}</select></label><div class="pw1512-estimate"><span>Estimación orientativa al 2 % anual</span><strong>${money(property.estimatedValue||estimate(property.purchasePrice||150000,property.purchaseYear))}</strong></div></div>`;
+      return `<label class="pw1512-select">Valor actual aproximado<select data-pw-select="currentValue">${options(VALUES,property.currentValue||200000)}</select></label><label class="pw1512-upload">📷 Subir tasación, PDF o pantallazo<input type="file" accept="image/*,application/pdf,.csv,text/csv" data-pw-file="valuation"></label>${property.valuationStatus?`<div class="pw1512-status">✓ ${esc(property.valuationStatus)}</div>`:''}`;
+    }
+    if(property.step===4)return `<div class="pw1512-options two"><button class="pw1512-choice ${property.mortgage===true?'active':''}" data-pw-mortgage="yes">Sí<small>Queda capital por pagar.</small></button><button class="pw1512-choice ${property.mortgage===false?'active':''}" data-pw-mortgage="no">No<small>Está libre de hipoteca.</small></button></div>`;
+    if(property.step===5)return `<div class="pw1512-options"><label class="pw1512-select">Capital pendiente<select data-pw-select="mortgageRemaining">${options(MORTGAGES,property.mortgageRemaining||100000)}</select></label><label class="pw1512-select">Cuota mensual<select data-pw-select="mortgageMonthly">${options(PAYMENTS,property.mortgageMonthly||750)}</select></label><label class="pw1512-upload">📄 Subir recibo, PDF o pantallazo<input type="file" accept="image/*,application/pdf,.csv,text/csv" data-pw-file="mortgage"></label>${property.mortgageStatus?`<div class="pw1512-status">✓ ${esc(property.mortgageStatus)}</div>`:''}</div>`;
+    if(property.step===6)return `<label class="pw1512-select">Alquiler mensual aproximado<select data-pw-select="rentMonthly">${options(RENTS,property.rentMonthly||750)}</select></label><div class="pw1512-note" style="margin-top:10px">No pedimos comunidad, IBI ni gastos. En esta fase buscamos una aproximación útil.</div>`;
+    const position=draft.properties.findIndex(item=>item.id===property.id)+1;const factor=property.ownership/100;
+    return `<div class="pw1512-summary"><div><span>Inmueble</span><strong>${esc(propertyName(property,position))}</strong></div><div><span>Tu parte</span><strong>${property.ownership} %</strong></div><div><span>Valor atribuible</span><strong>${money(propertyValue(property)*factor)}</strong></div><div><span>Hipoteca atribuible</span><strong>${money((property.mortgage?property.mortgageRemaining:0)*factor)}</strong></div>${property.type==='rented'?`<div><span>Alquiler atribuible</span><strong>${money(property.rentMonthly*factor)}/mes</strong></div>`:''}</div>`;
+  }
+  function renderWizard(root,id) {
+    draft=loadDraft();let property=draft.properties.find(item=>item.id===id);
+    if(!property){property=defaultProperty(draft.properties.length);draft.properties.push(property);}
+    if(property.step===3&&property.valueMethod==='purchase'){property.purchasePrice=property.purchasePrice||150000;property.purchaseYear=property.purchaseYear||Math.max(1970,yearNow-5);property.estimatedValue=estimate(property.purchasePrice,property.purchaseYear);}
+    if(property.step===3&&property.valueMethod!=='purchase')property.currentValue=property.currentValue||200000;
+    if(property.step===5){property.mortgageRemaining=property.mortgageRemaining||100000;property.mortgageMonthly=property.mortgageMonthly||750;}
+    if(property.step===6&&property.type==='rented')property.rentMonthly=property.rentMonthly||750;
+    draft.editing=property.id;save();injectStyles();root.dataset.pw1512='wizard';root.classList.add('pw1512');
+    const [title,subtitle]=stepTitle(property.step,property);
+    root.innerHTML=`<div class="pw1512-shell"><p class="kicker">Inmueble ${draft.properties.findIndex(item=>item.id===property.id)+1} · paso ${property.step+1} de 8</p><div class="pw1512-progress">${Array.from({length:8},(_,i)=>`<i class="${i<=property.step?'done':''}"></i>`).join('')}</div><h1>${esc(title).replace(/(inmueble|valoración|hipoteca|alquiler)/i,'<em>$1</em>')}</h1><p class="lead">${esc(subtitle)}</p><section class="pw1512-card">${stepMarkup(property)}</section><div class="pw1512-actions">${property.step?'<button type="button" class="pw1512-back" data-pw-back>← Atrás</button>':'<button type="button" class="pw1512-back" data-pw-cancel>Cancelar</button>'}<button type="button" class="pw1512-next" data-pw-next ${isStepValid(property)?'':'disabled'}>${property.step===7?'Guardar vivienda':'Continuar'} →</button></div></div>`;
+    bindWizard(root,property);
+  }
+  function bindWizard(root,property) {
+    $$('[data-pw-type]',root).forEach(button=>button.onclick=()=>{property.type=button.dataset.pwType;if(property.type!=='rented')property.rentMonthly=0;save();renderWizard(root,property.id);});
+    $$('[data-pw-ownership]',root).forEach(button=>button.onclick=()=>{property.ownership=finite(button.dataset.pwOwnership);save();renderWizard(root,property.id);});
+    $$('[data-pw-method]',root).forEach(button=>button.onclick=()=>{property.valueMethod=button.dataset.pwMethod;if(property.valueMethod==='document')property.currentValue=property.currentValue||200000;save();renderWizard(root,property.id);});
+    $$('[data-pw-mortgage]',root).forEach(button=>button.onclick=()=>{property.mortgage=button.dataset.pwMortgage==='yes';if(!property.mortgage){property.mortgageRemaining=0;property.mortgageMonthly=0;}save();renderWizard(root,property.id);});
+    $$('[data-pw-select]',root).forEach(select=>select.onchange=()=>{property[select.dataset.pwSelect]=finite(select.value);if(['purchasePrice','purchaseYear'].includes(select.dataset.pwSelect))property.estimatedValue=estimate(property.purchasePrice,property.purchaseYear);save();renderWizard(root,property.id);});
+    $$('[data-pw-file]',root).forEach(input=>input.onchange=()=>{const file=input.files?.[0];if(file)importDocument(file,input.dataset.pwFile,property);});
+    $('[data-pw-back]',root)?.addEventListener('click',()=>{property.step=prevStep(property);save();renderWizard(root,property.id);});
+    $('[data-pw-cancel]',root)?.addEventListener('click',()=>{draft.properties=draft.properties.filter(item=>item.id!==property.id);draft.editing=null;save();renderList(root);});
+    $('[data-pw-next]',root)?.addEventListener('click',()=>{
+      if(!isStepValid(property))return;
+      if(property.step===3&&property.valueMethod==='purchase')property.estimatedValue=estimate(property.purchasePrice||150000,property.purchaseYear);
+      if(property.step<7){property.step=nextStep(property);save();renderWizard(root,property.id);return;}
+      property.step=7;draft.editing=null;save();renderList(root);
+    });
+  }
+  function renderList(root) {
+    draft=loadDraft();injectStyles();root.dataset.pw1512='list';root.classList.add('pw1512');const total=totals();
+    root.innerHTML=`<div class="pw1512-shell"><p class="kicker">Patrimonio inmobiliario</p><h1>Tus inmuebles, <em>uno a uno.</em></h1><p class="lead">Ya no hay campos libres: todo se configura con decisiones y selectores.</p><section class="pw1512-hero"><small>FOTOGRAFÍA APROXIMADA</small><h2>${draft.properties.length} inmueble${draft.properties.length===1?'':'s'}</h2><p>Valor atribuible ${money(total.value)} · hipotecas ${money(total.mortgage)} · alquiler ${money(total.rent)}/mes</p></section><section class="pw1512-card"><h3>Viviendas añadidas</h3><div class="pw1512-list">${draft.properties.map((property,index)=>`<div class="pw1512-row"><span>⌂</span><span><b>${esc(propertyName(property,index+1))}</b><small>${money(propertyValue(property)*property.ownership/100)} atribuibles${property.mortgage?` · hipoteca ${money(property.mortgageRemaining*property.ownership/100)}`:''}${property.type==='rented'?` · alquiler ${money(property.rentMonthly*property.ownership/100)}/mes`:''}</small></span><button type="button" data-pw-edit="${esc(property.id)}">Editar</button></div>`).join('')}</div></section><section class="pw1512-card"><h3>¿Tienes otra vivienda?</h3><p>Puedes añadir una segunda, tercera o las que necesites.</p><div class="pw1512-options two"><button type="button" class="pw1512-choice" data-pw-add>Sí, añadir otra</button><button type="button" class="pw1512-choice active" data-pw-finish>No, he terminado</button></div></section></div>`;
+    $$('[data-pw-edit]',root).forEach(button=>button.onclick=()=>renderWizard(root,button.dataset.pwEdit));
+    $('[data-pw-add]',root).onclick=()=>{const property=defaultProperty(draft.properties.length);draft.properties.push(property);draft.editing=property.id;save();renderWizard(root,property.id);};
+    $('[data-pw-finish]',root).onclick=finishProperties;
+  }
