@@ -1,0 +1,30 @@
+      <div class="prop1511-actions"><button type="button" class="prop1511-soft" data-prop-cancel>Volver al listado</button><button type="button" class="prop1511-primary" data-prop-save>Guardar esta vivienda →</button></div>
+    </div>`;
+    bindEditor(root, property);
+  }
+
+  function bindEditor(root, property) {
+    $$('[data-prop-field]',root).forEach(input=>input.addEventListener('input',()=>{const field=input.dataset.propField; property[field]=['name','purchaseYear'].includes(field)?input.value:finite(input.value); if(field==='purchasePrice'||field==='purchaseYear'){property.estimatedValue=estimateFromPurchase(property.purchasePrice,property.purchaseYear); const node=$('[data-prop-estimate]',root); if(node)node.textContent=money(property.estimatedValue);} saveDraft();}));
+    $$('[data-prop-habitual]',root).forEach(button=>button.onclick=()=>{property.habitual=button.dataset.propHabitual==='yes'; property.occupancy=property.habitual?'habitual':(property.occupancy==='habitual'?'rented':property.occupancy); saveDraft(); renderEditor(root,property.id);});
+    $$('[data-prop-occupancy]',root).forEach(button=>button.onclick=()=>{property.occupancy=button.dataset.propOccupancy; saveDraft(); renderEditor(root,property.id);});
+    $$('[data-prop-value-method]',root).forEach(button=>button.onclick=()=>{property.valueMethod=button.dataset.propValueMethod; if(property.valueMethod==='document')property.valueMethod='known'; saveDraft(); renderEditor(root,property.id);});
+    $$('[data-prop-mortgage]',root).forEach(button=>button.onclick=()=>{property.mortgage=button.dataset.propMortgage==='yes'; if(!property.mortgage){property.mortgageRemaining=0;property.mortgageMonthly=0;} saveDraft(); renderEditor(root,property.id);});
+    $$('[data-prop-file]',root).forEach(input=>input.onchange=()=>{const file=input.files?.[0]; if(file)importDocument(file,input.dataset.propFile==='mortgage'?'mortgage':'valuation',property);});
+    $('[data-prop-save]',root).onclick=()=>{if(!property.name.trim())return alert('Pon un nombre a la vivienda.'); const value=propertyValue(property); if(value<=0)return alert('Indica el valor actual o el precio y año de compra.'); if(property.occupancy==='rented'&&finite(property.rentMonthly)<=0)return alert('Indica aproximadamente el alquiler mensual.'); draft.editing=null; saveDraft(); renderList(root);};
+    $('[data-prop-cancel]',root).onclick=()=>{draft.editing=null; saveDraft(); renderList(root);};
+  }
+
+  function renderList(root) {
+    const total=totals(); root.dataset.prop1511='list'; root.classList.add('prop1511');
+    root.innerHTML = `<div class="prop1511-shell"><p class="kicker">Patrimonio inmobiliario</p><h1>Configura tus inmuebles <em>uno a uno.</em></h1><p class="lead">Añade cada vivienda y confirma cuándo hayas terminado.</p>
+      <section class="prop1511-hero"><small>FOTOGRAFÍA APROXIMADA</small><h2>${draft.properties.length} inmueble${draft.properties.length===1?'':'s'}</h2><p>Valor y deuda se calculan aplicando tu porcentaje de propiedad.</p><div class="prop1511-summary" style="margin-top:13px"><div><span>Valor atribuible</span><strong>${money(total.value)}</strong></div><div><span>Hipotecas</span><strong>${money(total.mortgage)}</strong></div><div><span>Alquiler mensual</span><strong>${money(total.rent)}</strong></div></div></section>
+      <section class="prop1511-card"><h3>Tus viviendas</h3><div class="prop1511-list">${draft.properties.map(property=>`<div class="prop1511-row"><span class="prop1511-icon">⌂</span><span><b>${esc(property.name)}</b><small>${propertyLabel(property)} · ${money(propertyValue(property)*clamp(property.ownership,0,100)/100)}${property.mortgage?` · hipoteca ${money(property.mortgageRemaining*clamp(property.ownership,0,100)/100)}`:''}${property.occupancy==='rented'?` · alquiler ${money(property.rentMonthly*clamp(property.ownership,0,100)/100)}/mes`:''}</small></span><button type="button" data-prop-edit="${esc(property.id)}">Editar</button></div>`).join('')||'<div class="prop1511-note">Todavía no has añadido ninguna vivienda.</div>'}</div></section>
+      <div class="prop1511-actions"><button type="button" class="prop1511-soft" data-prop-add>＋ Añadir otra vivienda</button>${draft.properties.length?'<button type="button" class="prop1511-primary" data-prop-finish>He terminado con los inmuebles →</button>':''}</div></div>`;
+    $$('[data-prop-edit]',root).forEach(button=>button.onclick=()=>renderEditor(root,button.dataset.propEdit));
+    $('[data-prop-add]',root).onclick=()=>{const property=emptyProperty(draft.properties.length); draft.properties.push(property); saveDraft(); renderEditor(root,property.id);};
+    $('[data-prop-finish]',root)?.addEventListener('click',()=>finishProperties(root));
+  }
+
+  function finishProperties(root) {
+    const total=totals(); if(!draft.properties.length||total.value<=0)return;
+    bridge()?.setProduct?.('realestate',true,total.value,{where:draft.properties.map(item=>item.name).join(', '),count:draft.properties.length,monthlyIncome:total.rent});
