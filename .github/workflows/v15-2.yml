@@ -1,0 +1,21 @@
+name: v15.2 screenshot reader
+on:
+  push:
+    paths:
+      - 'mi-plan/screenshot-reader-v15-2.js'
+      - 'mi-plan/safe-loader-v15-2.js'
+      - 'mi-plan/v15-2.html'
+      - 'mi-plan/tests/screenshot-reader-v15-2.test.mjs'
+      - '.github/workflows/v15-2.yml'
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --check mi-plan/screenshot-reader-v15-2.js
+      - run: node --check mi-plan/safe-loader-v15-2.js
+      - run: node --test mi-plan/tests/screenshot-reader-v15-2.test.mjs
