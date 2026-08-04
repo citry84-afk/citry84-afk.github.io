@@ -1,0 +1,80 @@
+/* FinanzasFácil v15.11 · inmuebles uno a uno con valoración e hipoteca */
+(() => {
+  'use strict';
+  if (globalThis.__FF_PROPERTY_ONBOARDING_1511__) return;
+  globalThis.__FF_PROPERTY_ONBOARDING_1511__ = true;
+
+  const VERSION = '15.11';
+  const STORE = 'ff_properties_v1511';
+  const OCR_URL = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+  const PDF_URL = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs';
+  const PDF_WORKER_URL = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; } catch (_) { return fallback; } };
+  const write = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) {} };
+  const finite = value => Number.isFinite(Number(value)) ? Number(value) : 0;
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, finite(value)));
+  const money = value => new Intl.NumberFormat('es-ES', {style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:2}).format(finite(value));
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  const uid = () => `property-${globalThis.crypto?.randomUUID?.() || Math.random().toString(36).slice(2)}`;
+  const yearNow = new Date().getFullYear();
+
+  function emptyProperty(index = 0) {
+    return {
+      id: uid(), name: `Vivienda ${index + 1}`, habitual: index === 0, occupancy: index === 0 ? 'habitual' : 'rented', ownership: 100,
+      valueMethod: 'known', currentValue: 0, purchasePrice: 0, purchaseYear: '', estimatedValue: 0,
+      mortgage: false, mortgageRemaining: 0, mortgageMonthly: 0, rentMonthly: 0,
+      valuationFile: null, mortgageFile: null, valuationStatus: '', mortgageStatus: ''
+    };
+  }
+
+  function emptyDraft() {
+    return {version:VERSION, properties:[], editing:null, otherDebtAmount:0, otherDebtMonthly:0, confirmed:false, updatedAt:new Date().toISOString()};
+  }
+
+  function loadDraft() {
+    const value = read(STORE, null);
+    if (!value || !Array.isArray(value.properties)) return emptyDraft();
+    return {...emptyDraft(), ...value, version:VERSION};
+  }
+
+  let draft = loadDraft();
+  function saveDraft() { draft.version = VERSION; draft.updatedAt = new Date().toISOString(); write(STORE, draft); }
+
+  function estimateFromPurchase(price, year) {
+    const years = Math.max(0, Math.min(60, yearNow - Math.round(finite(year))));
+    if (!price || !year || years < 0) return 0;
+    return Math.round((finite(price) * Math.pow(1.02, years)) / 100) * 100;
+  }
+
+  function propertyValue(property) {
+    if (property.valueMethod === 'purchase') return finite(property.estimatedValue || estimateFromPurchase(property.purchasePrice, property.purchaseYear));
+    return finite(property.currentValue);
+  }
+
+  function totals() {
+    return draft.properties.reduce((sum, property) => {
+      const factor = clamp(property.ownership, 0, 100) / 100;
+      const value = propertyValue(property) * factor;
+      const mortgage = (property.mortgage ? finite(property.mortgageRemaining) : 0) * factor;
+      const mortgageMonthly = (property.mortgage ? finite(property.mortgageMonthly) : 0) * factor;
+      const rent = (property.occupancy === 'rented' ? finite(property.rentMonthly) : 0) * factor;
+      sum.value += value; sum.mortgage += mortgage; sum.mortgageMonthly += mortgageMonthly; sum.rent += rent;
+      if (property.mortgage && property.mortgageRemaining > 0) sum.mortgageCount += 1;
+      return sum;
+    }, {value:0,mortgage:0,mortgageMonthly:0,rent:0,mortgageCount:0});
+  }
+
+  function bridge() { return globalThis.FFPortraitBridge1510; }
+  function current() { return bridge()?.current?.() || {}; }
+
+  function injectStyles() {
+    if ($('style[data-property1511]')) return;
+    const style = document.createElement('style');
+    style.dataset.property1511 = '1';
+    style.textContent = `
+      .prop1511{--ink:#0b2240;--muted:#64758c;--line:#d2dfec;--blue:#1674d1;--orange:#ff8613;color:var(--ink)}.prop1511 *{box-sizing:border-box}
+      .prop1511-shell{display:grid;gap:14px}.prop1511-hero{padding:18px;border-radius:22px;background:linear-gradient(145deg,#0b2b52,#1261a8);color:#fff;box-shadow:0 18px 42px rgba(8,42,92,.17)}
+      .prop1511-hero small{color:#bad2e8}.prop1511-hero h2{margin:6px 0 8px;font-size:27px;letter-spacing:-.04em}.prop1511-hero p{margin:0;color:#d4e2ef;font-size:11px;line-height:1.5}
+      .prop1511-card{padding:16px;border:1px solid var(--line);border-radius:21px;background:#fff;box-shadow:0 10px 28px rgba(16,54,108,.055)}.prop1511-card h3{margin:0 0 5px;font-size:18px}.prop1511-card>p{margin:0 0 12px;color:var(--muted);font-size:11px;line-height:1.5}
