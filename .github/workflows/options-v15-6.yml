@@ -1,0 +1,27 @@
+name: FinanzasFácil v15.6
+on:
+  push:
+    paths:
+      - 'mi-plan/ibkr-shared-v15-6.js'
+      - 'mi-plan/investment-onboarding-v15-6.js'
+      - 'mi-plan/safe-loader-v15-6.js'
+      - 'mi-plan/tests/ibkr-shared-v15-6.test.mjs'
+      - '.github/workflows/options-v15-6.yml'
+  pull_request:
+    paths:
+      - 'mi-plan/ibkr-shared-v15-6.js'
+      - 'mi-plan/investment-onboarding-v15-6.js'
+      - 'mi-plan/safe-loader-v15-6.js'
+      - 'mi-plan/tests/ibkr-shared-v15-6.test.mjs'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --check mi-plan/ibkr-shared-v15-6.js
+      - run: node --check mi-plan/investment-onboarding-v15-6.js
+      - run: node --check mi-plan/safe-loader-v15-6.js
+      - run: node --test mi-plan/tests/ibkr-shared-v15-6.test.mjs
