@@ -1,0 +1,59 @@
+    await new Promise((resolve, reject) => { const script=document.createElement('script'); script.src=OCR_URL; script.onload=resolve; script.onerror=reject; document.head.appendChild(script); });
+    return globalThis.Tesseract;
+  }
+
+  async function readFileText(file) {
+    if (/csv|text|json/i.test(file.type) || /\.(csv|txt|json)$/i.test(file.name)) return file.text();
+    if (/pdf/i.test(file.type) || /\.pdf$/i.test(file.name)) {
+      const pdfjs = await import(PDF_URL); pdfjs.GlobalWorkerOptions.workerSrc = PDF_WORKER_URL;
+      const pdf = await pdfjs.getDocument({data:await file.arrayBuffer()}).promise; let text='';
+      for (let index=1; index<=Math.min(pdf.numPages, 10); index+=1) { const page=await pdf.getPage(index); const content=await page.getTextContent(); text += '\n' + content.items.map(item=>item.str).join(' '); }
+      return text;
+    }
+    const tesseract = await loadOCR(); const result = await tesseract.recognize(file, 'spa'); return result?.data?.text || '';
+  }
+
+  function analyseDocument(text, kind) {
+    const reader = globalThis.FFDocumentReader;
+    const base = reader?.analyse?.(text) || {};
+    const normalized = String(text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const lines = String(text || '').split(/\r?\n/);
+    const keywords = kind === 'mortgage'
+      ? ['capital pendiente','saldo pendiente','principal pendiente','deuda pendiente','importe pendiente','hipoteca']
+      : ['valor de tasacion','valoracion','valor de mercado','valor actual','precio estimado','tasacion'];
+    let best = null;
+    for (const line of lines) {
+      const lower = line.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      const score = keywords.reduce((sum, word) => sum + (lower.includes(word) ? 25 : 0), 0);
+      if (!score) continue;
+      const candidates = reader?.findCandidates?.(line) || [];
+      for (const candidate of candidates) if (!best || score + finite(candidate.score) > best.score) best = {amount:candidate.amount,score:score+finite(candidate.score)};
+    }
+    const institution = base.institution || ['CaixaBank','Santander','BBVA','Sabadell','ING','Unicaja','Bankinter','Openbank','MyInvestor','Kutxabank','Ibercaja','Abanca','Cajamar'].find(name => normalized.includes(name.toLowerCase())) || '';
+    return {amount:best?.amount ?? base.amount ?? null,date:base.date || '',institution,confidence:best ? 'high' : base.confidence || 'low'};
+  }
+
+  function reviewDetected(analysis, title) {
+    ensureDialog(); const dialog=$('#prop1511Review'); const body=$('[data-prop1511-review]',dialog);
+    body.innerHTML = `<p style="color:#b6c9db;font-size:11px">${esc(title)} · ${esc(analysis.institution || 'entidad no detectada')} · confianza ${esc(analysis.confidence)}</p><label>Importe (€)<input id="prop1511DetectedAmount" type="number" min="0" step="0.01" value="${analysis.amount ?? ''}"></label><label>Fecha<input id="prop1511DetectedDate" type="date" value="${analysis.date || ''}"></label><div class="prop1511-dialog-actions"><button value="cancel">Cancelar</button><button value="default" class="primary">Usar este dato</button></div>`;
+    return new Promise(resolve => { const close=()=>{dialog.removeEventListener('close',close); if(dialog.returnValue!=='default') return resolve(null); const amount=finite($('#prop1511DetectedAmount',body).value); resolve(amount>0?{amount,date:$('#prop1511DetectedDate',body).value,institution:analysis.institution}:null);}; dialog.addEventListener('close',close); dialog.showModal(); });
+  }
+
+  async function importDocument(file, kind, property) {
+    const overlay=document.createElement('div'); overlay.className='prop1511-progress'; overlay.innerHTML=`<div><b>${kind==='mortgage'?'Leyendo la hipoteca…':'Leyendo la valoración…'}</b><span>El archivo se procesa en este dispositivo.</span></div>`; document.body.appendChild(overlay);
+    try {
+      const text=await readFileText(file); const analysis=analyseDocument(text,kind); const confirmed=await reviewDetected(analysis,kind==='mortgage'?'Hipoteca':'Valoración del inmueble');
+      if (!confirmed) return;
+      if (kind==='mortgage') { property.mortgage=true; property.mortgageRemaining=confirmed.amount; property.mortgageFile={name:file.name,type:file.type,size:file.size}; property.mortgageStatus=`${money(confirmed.amount)} detectados${confirmed.institution?` · ${confirmed.institution}`:''}`; }
+      else { property.valueMethod='known'; property.currentValue=confirmed.amount; property.valuationFile={name:file.name,type:file.type,size:file.size}; property.valuationStatus=`${money(confirmed.amount)} detectados${confirmed.institution?` · ${confirmed.institution}`:''}`; }
+      saveDraft(); renderEditor($('#portraitContent'), property.id);
+    } catch (error) { alert(error?.message || 'No se pudo interpretar el archivo. Puedes introducir el dato manualmente.'); }
+    finally { overlay.remove(); }
+  }
+
+  function propertyLabel(property) {
+    if (property.habitual) return 'Vivienda habitual';
+    return property.occupancy === 'rented' ? 'Alquilada' : 'Disponible / uso propio';
+  }
+
+  function renderEditor(root, id) {
