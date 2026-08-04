@@ -1,0 +1,90 @@
+/* FinanzasFácil v15.12 · inmuebles guiados solo con selectores */
+(() => {
+  'use strict';
+  if (globalThis.__FF_PROPERTY_ONBOARDING_1512__) return;
+  globalThis.__FF_PROPERTY_ONBOARDING_1512__ = true;
+
+  const VERSION = '15.12';
+  const STORE = 'ff_properties_v1512';
+  const OLD_STORE = 'ff_properties_v1511';
+  const OCR_URL = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+  const PDF_URL = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs';
+  const PDF_WORKER_URL = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; } catch (_) { return fallback; } };
+  const write = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) {} };
+  const finite = value => Number.isFinite(Number(value)) ? Number(value) : 0;
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, finite(value)));
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const money = value => new Intl.NumberFormat('es-ES', {style:'currency',currency:'EUR',maximumFractionDigits:0}).format(finite(value));
+  const uid = () => `property-${globalThis.crypto?.randomUUID?.() || Math.random().toString(36).slice(2)}`;
+  const yearNow = new Date().getFullYear();
+
+  const VALUES = [50000,75000,100000,125000,150000,175000,200000,225000,250000,275000,300000,350000,400000,450000,500000,600000,750000,1000000,1500000];
+  const PURCHASE_VALUES = [30000,50000,75000,100000,125000,150000,175000,200000,250000,300000,350000,400000,500000,600000,750000,1000000];
+  const MORTGAGES = [10000,25000,50000,75000,100000,125000,150000,175000,200000,250000,300000,350000,400000,500000,600000];
+  const PAYMENTS = [200,300,400,500,600,750,900,1000,1100,1200,1400,1600,1800,2000,2250,2500,3000];
+  const RENTS = [300,400,500,550,600,650,700,750,800,850,900,1000,1100,1200,1300,1400,1500,1750,2000,2500,3000];
+  const OWNERSHIP = [100,50,33,25];
+  const OTHER_DEBTS = [0,5000,10000,15000,20000,25000,30000,40000,50000,75000,100000,150000,200000];
+
+  function nearest(value, list, fallback = list[0]) {
+    const n = finite(value);
+    if (!n) return fallback;
+    return list.reduce((best, current) => Math.abs(current - n) < Math.abs(best - n) ? current : best, list[0]);
+  }
+  function estimate(price, year) {
+    const years = Math.max(0, Math.min(60, yearNow - finite(year)));
+    return price && year ? Math.round((finite(price) * Math.pow(1.02, years)) / 1000) * 1000 : 0;
+  }
+  function defaultProperty(index = 0) {
+    return {
+      id: uid(), index, type:'', ownership:100, valueMethod:'known', currentValue:0, purchasePrice:0,
+      purchaseYear:Math.max(1970, yearNow - 5), estimatedValue:0, mortgage:null, mortgageRemaining:0,
+      mortgageMonthly:0, rentMonthly:0, step:0, valuationFile:null, mortgageFile:null,
+      valuationStatus:'', mortgageStatus:''
+    };
+  }
+  function defaultDraft() {
+    return {version:VERSION,properties:[],editing:null,confirmed:false,otherDebt:false,otherDebtAmount:0,otherDebtMonthly:0,updatedAt:new Date().toISOString()};
+  }
+  function migrateOld() {
+    const old = read(OLD_STORE, null);
+    if (!old?.properties?.length) return defaultDraft();
+    return {
+      ...defaultDraft(),
+      properties: old.properties.map((item, index) => {
+        const type = item.habitual ? 'habitual' : item.occupancy === 'rented' ? 'rented' : 'available';
+        const currentValue = nearest(item.currentValue || item.estimatedValue || item.purchasePrice, VALUES, 200000);
+        return {
+          ...defaultProperty(index), id:item.id || uid(), type, ownership:nearest(item.ownership, OWNERSHIP, 100),
+          valueMethod:item.valueMethod === 'purchase' ? 'purchase' : 'known', currentValue,
+          purchasePrice:nearest(item.purchasePrice, PURCHASE_VALUES, 150000), purchaseYear:finite(item.purchaseYear) || yearNow - 5,
+          estimatedValue:finite(item.estimatedValue) || estimate(item.purchasePrice, item.purchaseYear), mortgage:Boolean(item.mortgage),
+          mortgageRemaining:nearest(item.mortgageRemaining, MORTGAGES, 100000), mortgageMonthly:nearest(item.mortgageMonthly, PAYMENTS, 750),
+          rentMonthly:type === 'rented' ? nearest(item.rentMonthly, RENTS, 750) : 0, step:7,
+          valuationFile:item.valuationFile || null, mortgageFile:item.mortgageFile || null,
+          valuationStatus:item.valuationStatus || '', mortgageStatus:item.mortgageStatus || ''
+        };
+      }),
+      confirmed:Boolean(old.confirmed), otherDebtAmount:nearest(old.otherDebtAmount, OTHER_DEBTS, 0),
+      otherDebtMonthly:nearest(old.otherDebtMonthly, PAYMENTS, 200)
+    };
+  }
+  function loadDraft() {
+    const current = read(STORE, null);
+    if (current?.properties) return {...defaultDraft(),...current,version:VERSION};
+    const migrated = migrateOld();
+    write(STORE, migrated);
+    return migrated;
+  }
+  let draft = loadDraft();
+  const save = () => { draft.version=VERSION;draft.updatedAt=new Date().toISOString();write(STORE,draft); };
+  const bridge = () => globalThis.FFPortraitBridge1512 || globalThis.FFPortraitBridge1510;
+  const currentStep = () => bridge()?.current?.() || {};
+
+  function propertyName(property, position) {
+    if (property.type === 'habitual') return 'Vivienda habitual';
+    if (property.type === 'rented') return `Vivienda alquilada ${position}`;
+    return position === 1 ? 'Segunda residencia' : `Vivienda disponible ${position}`;
