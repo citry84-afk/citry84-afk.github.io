@@ -1,0 +1,25 @@
+name: Onboarding brokers v15.5
+on:
+  push:
+    paths:
+      - 'mi-plan/broker-import-v15-5-core.js'
+      - 'mi-plan/onboarding-brokers-v15-5.js'
+      - 'mi-plan/ownership-totals-v15-5.js'
+      - 'mi-plan/safe-loader-v15-5.js'
+      - 'mi-plan/v15-5.html'
+      - 'mi-plan/tests/broker-import-v15-5.test.mjs'
+      - '.github/workflows/onboarding-brokers-v15-5.yml'
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --check mi-plan/broker-import-v15-5-core.js
+      - run: node --check mi-plan/onboarding-brokers-v15-5.js
+      - run: node --check mi-plan/ownership-totals-v15-5.js
+      - run: node --check mi-plan/safe-loader-v15-5.js
+      - run: node --test mi-plan/tests/broker-import-v15-5.test.mjs
