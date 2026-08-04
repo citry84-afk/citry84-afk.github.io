@@ -1,0 +1,36 @@
+    bridge()?.setProduct?.('debt',total.mortgage>0,total.mortgage,{where:'Hipotecas de inmuebles',count:Math.max(1,total.mortgageCount),monthlyPayment:total.mortgageMonthly});
+    draft.confirmed=true; saveDraft();
+    const native=$('#portraitNext'); if(!native)return; native.classList.remove('prop1511-native-hidden'); native.disabled=false; native.style.removeProperty('display'); native.click();
+  }
+
+  function renderDebtAsk(root) {
+    const total=totals(); root.dataset.prop1511='debt-ask'; root.classList.add('prop1511');
+    root.innerHTML=`<div class="prop1511-shell"><p class="kicker">Hipotecas ya detectadas</p><h1>Ya hemos contado <em>${money(total.mortgage)}</em> de hipoteca.</h1><p class="lead">No necesitas volver a introducir las hipotecas de tus viviendas. Solo revisaremos si tienes otras deudas.</p><section class="prop1511-card"><div class="prop1511-summary"><div><span>Capital pendiente</span><strong>${money(total.mortgage)}</strong></div><div><span>Cuotas mensuales</span><strong>${money(total.mortgageMonthly)}</strong></div><div><span>Hipotecas</span><strong>${total.mortgageCount}</strong></div></div></section><div class="prop1511-actions"><button type="button" class="prop1511-primary" data-prop-review-debt>Revisar otras deudas →</button></div></div>`;
+    const native=$('#portraitNext'); if(native)native.classList.add('prop1511-native-hidden');
+    $('[data-prop-review-debt]',root).onclick=()=>{native.classList.remove('prop1511-native-hidden'); native.style.visibility='visible'; native.disabled=false; native.click();};
+  }
+
+  function renderDebtDetail(root) {
+    const total=totals(); root.dataset.prop1511='debt-detail'; root.classList.add('prop1511');
+    root.innerHTML=`<div class="prop1511-shell"><p class="kicker">Solo falta confirmar</p><h1>¿Tienes otras deudas además de las <em>hipotecas?</em></h1><p class="lead">Las hipotecas ya están incluidas. Añade aquí préstamos personales, familiares u otras deudas, si las hay.</p><section class="prop1511-card"><div class="prop1511-summary"><div><span>Hipotecas</span><strong>${money(total.mortgage)}</strong></div><div><span>Cuotas hipotecarias</span><strong>${money(total.mortgageMonthly)}</strong></div><div><span>Otras deudas</span><strong data-prop-other-total>${money(draft.otherDebtAmount)}</strong></div></div><div class="prop1511-grid" style="margin-top:12px"><label class="prop1511-field">Otras deudas pendientes (€)<input data-prop-other="amount" type="number" min="0" value="${finite(draft.otherDebtAmount)||''}" placeholder="0"></label><label class="prop1511-field">Cuotas mensuales adicionales (€)<input data-prop-other="monthly" type="number" min="0" value="${finite(draft.otherDebtMonthly)||''}" placeholder="0"></label></div></section><div class="prop1511-actions"><button type="button" class="prop1511-primary" data-prop-confirm-debt>Confirmar deudas y continuar →</button></div></div>`;
+    const native=$('#portraitNext'); if(native)native.classList.add('prop1511-native-hidden');
+    $$('[data-prop-other]',root).forEach(input=>input.oninput=()=>{if(input.dataset.propOther==='amount')draft.otherDebtAmount=finite(input.value);else draft.otherDebtMonthly=finite(input.value); saveDraft(); const node=$('[data-prop-other-total]',root); if(node)node.textContent=money(draft.otherDebtAmount);});
+    $('[data-prop-confirm-debt]',root).onclick=()=>{const debt=total.mortgage+finite(draft.otherDebtAmount), monthly=total.mortgageMonthly+finite(draft.otherDebtMonthly); bridge()?.setProduct?.('debt',debt>0,debt,{where:draft.otherDebtAmount>0?'Hipotecas y otras deudas':'Hipotecas de inmuebles',count:Math.max(1,total.mortgageCount+(draft.otherDebtAmount>0?1:0)),monthlyPayment:monthly}); native.classList.remove('prop1511-native-hidden'); native.disabled=false; native.style.removeProperty('display'); native.click();};
+  }
+
+  function patch() {
+    const root=$('#portraitContent'); if(!root)return; const step=current();
+    const relevant = (step.type==='realestate'&&step.kind==='detail') || (step.type==='debt'&&draft.confirmed&&totals().mortgage>0);
+    if(!relevant && root.dataset.prop1511){ delete root.dataset.prop1511; root.classList.remove('prop1511'); $('#portraitNext')?.classList.remove('prop1511-native-hidden'); }
+    if(step.type==='realestate'&&step.kind==='detail') {
+      injectStyles(); const native=$('#portraitNext'); if(native)native.classList.add('prop1511-native-hidden');
+      if(root.dataset.prop1511)return; draft=loadDraft();
+      if(!draft.properties.length){const first=emptyProperty(0);draft.properties.push(first);saveDraft();renderEditor(root,first.id);} else if(draft.editing)renderEditor(root,draft.editing); else renderList(root);
+      return;
+    }
+    if(step.type==='debt'&&draft.confirmed&&totals().mortgage>0) {
+      injectStyles(); if(step.kind==='ask'&&root.dataset.prop1511!=='debt-ask')renderDebtAsk(root); else if(step.kind==='detail'&&root.dataset.prop1511!=='debt-detail')renderDebtDetail(root);
+    }
+  }
+
+  let scheduled=false; const schedule=()=>{if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;patch();});};
