@@ -1,0 +1,4 @@
+  new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
+  globalThis.addEventListener('focus',schedule); setInterval(patch,500); setTimeout(patch,80);
+  globalThis.FFPropertyOnboarding1511={version:VERSION,loadDraft,totals,estimateFromPurchase,patch};
+})();
