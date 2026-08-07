@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#07111f" />
   <title>Luis Portfolio Control</title>
-  <link rel="manifest" href="/manifest.webmanifest?v=20260802b" />
+  <link rel="manifest" href="/manifest.webmanifest?v=20260807a" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <link rel="stylesheet" href="/styles.css?v=20260802b" />
+  <link rel="stylesheet" href="/styles.css?v=20260807a" />
   <style>
     .weekly-share{margin:0 0 18px;padding:18px}.weekly-share-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}.weekly-share-head h2{margin:3px 0 0}.weekly-share-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.weekly-share-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.weekly-share-item{padding:18px;border:1px solid rgba(148,163,184,.22);border-radius:18px;background:rgba(15,23,42,.48);min-height:112px;display:flex;flex-direction:column;justify-content:center}.weekly-share-item .label{color:#94a3b8;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.weekly-share-item .value{margin:10px 0 0;font-size:clamp(2rem,4vw,3rem);font-weight:900;letter-spacing:-.045em;line-height:1}.weekly-share-item.good .value{color:#86efac}.weekly-share-item.bad .value{color:#fda4af}.weekly-share-item.warn .value{color:#fde68a}.share-card-btn{background:linear-gradient(90deg,rgba(52,211,153,.24),rgba(34,211,238,.24));border-color:rgba(125,211,252,.32)!important}.share-card-btn:active{transform:scale(.98)}@media(max-width:720px){.weekly-share-grid{grid-template-columns:1fr}.weekly-share{padding:14px}.weekly-share-head{align-items:flex-start;flex-direction:column}.weekly-share-actions{width:100%;justify-content:space-between}.weekly-share-item{min-height:98px}}
   </style>
@@ -24,20 +24,14 @@
       </div>
       <div class="hero-tools">
         <button class="ghost-btn" id="privacyBtn" type="button">👁️ Ocultar cifras</button>
-        <div class="hero-status" id="heroStatus">
-          <span class="status-dot"></span>
-          <div><strong id="statusText">Actualizando</strong><span id="lastUpdate">—</span></div>
-        </div>
+        <div class="hero-status" id="heroStatus"><span class="status-dot"></span><div><strong id="statusText">Actualizando</strong><span id="lastUpdate">—</span></div></div>
       </div>
     </header>
 
     <section class="card weekly-share sensitive" aria-labelledby="weeklyShareTitle">
       <div class="weekly-share-head">
         <div><span class="eyebrow">Resumen para compartir</span><h2 id="weeklyShareTitle">Seguimiento semanal</h2></div>
-        <div class="weekly-share-actions">
-          <span class="chip" id="weeklyShareDate">—</span>
-          <button class="ghost-btn share-card-btn" id="weeklyShareBtn" type="button">✨ Compartir ficha</button>
-        </div>
+        <div class="weekly-share-actions"><span class="chip" id="weeklyShareDate">—</span><button class="ghost-btn share-card-btn" id="weeklyShareBtn" type="button">✨ Compartir ficha</button></div>
       </div>
       <div class="weekly-share-grid" id="weeklyShareGrid"></div>
     </section>
@@ -45,35 +39,19 @@
     <section class="kpi-grid sensitive" id="kpiGrid"></section>
 
     <section class="card panel-main">
-      <div class="section-head explorer-head">
-        <div><span class="eyebrow">Explorador histórico</span><h2>Activa los años que quieras comparar</h2><p>2020–2021 reflejan la evolución de la cartera; desde 2022 también se incorpora el histórico de opciones ajustadas.</p></div>
-        <span class="chip" id="selectedYearsChip">2026</span>
-      </div>
+      <div class="section-head explorer-head"><div><span class="eyebrow">Explorador histórico</span><h2>Activa los años que quieras comparar</h2><p>2020–2021 reflejan la evolución de la cartera; desde 2022 también se incorpora el histórico de opciones ajustadas.</p></div><span class="chip" id="selectedYearsChip">2026</span></div>
       <div class="year-controls" id="yearControls"></div>
       <div class="history-summary sensitive" id="historySummary"></div>
     </section>
 
     <section class="grid two-cols">
-      <article class="card panel-main">
-        <div class="section-head"><div><span class="eyebrow">Evolución histórica</span><h2>Valor de cartera</h2></div><span class="chip green">Sobre aportado <strong id="ytdChip"></strong></span></div>
-        <div class="chart-wrap"><svg id="portfolioChart" role="img" aria-label="Gráfico histórico de cartera"></svg><div class="tooltip" id="portfolioTip"></div></div>
-      </article>
-      <article class="card panel-main">
-        <div class="section-head"><div><span class="eyebrow">Motor de ingresos</span><h2>Opciones ajustadas acumuladas</h2></div><span class="chip">Media <strong id="avgChip"></strong></span></div>
-        <div class="chart-wrap"><svg id="optionsYtdChart" role="img" aria-label="Gráfico de opciones ajustadas acumuladas"></svg><div class="tooltip" id="optionsTip"></div></div>
-      </article>
+      <article class="card panel-main"><div class="section-head"><div><span class="eyebrow">Evolución histórica</span><h2>Valor de cartera</h2></div><span class="chip green">Sobre aportado <strong id="ytdChip"></strong></span></div><div class="chart-wrap"><svg id="portfolioChart" role="img" aria-label="Gráfico histórico de cartera"></svg><div class="tooltip" id="portfolioTip"></div></div></article>
+      <article class="card panel-main"><div class="section-head"><div><span class="eyebrow">Motor de ingresos</span><h2>Opciones ajustadas acumuladas</h2></div><span class="chip">Media <strong id="avgChip"></strong></span></div><div class="chart-wrap"><svg id="optionsYtdChart" role="img" aria-label="Gráfico de opciones ajustadas acumuladas"></svg><div class="tooltip" id="optionsTip"></div></div></article>
     </section>
 
     <section class="grid two-thirds">
-      <article class="card panel-main wide">
-        <div class="section-head"><div><span class="eyebrow">Volatilidad operativa</span><h2>Resultado semanal de opciones ajustadas</h2><p>Opciones realizadas más el resultado realizado de acciones asignadas y sus dividendos brutos. Las posiciones todavía abiertas se muestran aparte.</p></div><span class="chip">Última <strong id="weeklyChip"></strong></span></div>
-        <div class="chart-wrap tall"><svg id="weeklyOptionsChart" role="img" aria-label="Gráfico semanal de opciones ajustadas"></svg><div class="tooltip" id="weeklyTip"></div></div>
-      </article>
-      <aside class="card risk-card">
-        <div class="section-head compact"><div><span class="eyebrow">Semáforo</span><h2>Riesgo y fondos disponibles</h2></div></div>
-        <div id="riskRows" class="risk-list sensitive"></div>
-        <div class="diagnosis" id="diagnosis"></div>
-      </aside>
+      <article class="card panel-main wide"><div class="section-head"><div><span class="eyebrow">Volatilidad operativa</span><h2>Resultado semanal de opciones ajustadas</h2><p>Opciones realizadas más el resultado realizado de acciones asignadas y sus dividendos brutos. Las posiciones todavía abiertas se muestran aparte.</p></div><span class="chip">Última <strong id="weeklyChip"></strong></span></div><div class="chart-wrap tall"><svg id="weeklyOptionsChart" role="img" aria-label="Gráfico semanal de opciones ajustadas"></svg><div class="tooltip" id="weeklyTip"></div></div></article>
+      <aside class="card risk-card"><div class="section-head compact"><div><span class="eyebrow">Semáforo</span><h2>Riesgo y fondos disponibles</h2></div></div><div id="riskRows" class="risk-list sensitive"></div><div class="diagnosis" id="diagnosis"></div></aside>
     </section>
 
     <section class="grid two-cols">
@@ -82,38 +60,25 @@
     </section>
 
     <section class="grid two-cols">
-      <article class="card panel-main">
-        <div class="section-head"><div><span class="eyebrow">Calidad del resultado</span><h2>Opciones realizadas y asignaciones</h2></div></div>
-        <div class="metric-table sensitive" id="optionsQuality"></div>
-      </article>
-      <article class="card panel-main">
-        <div class="section-head"><div><span class="eyebrow">Financiación</span><h2>Box spread GOOG</h2></div></div>
-        <div class="metric-table sensitive" id="boxSummary"></div>
-      </article>
+      <article class="card panel-main"><div class="section-head"><div><span class="eyebrow">Calidad del resultado</span><h2>Opciones realizadas y asignaciones</h2></div></div><div class="metric-table sensitive" id="optionsQuality"></div></article>
+      <article class="card panel-main"><div class="section-head"><div><span class="eyebrow">Financiación</span><h2>Box spread GOOG</h2></div></div><div class="metric-table sensitive" id="boxSummary"></div></article>
     </section>
 
     <section class="card goal-card">
       <div class="goal-grid">
-        <div>
-          <span class="eyebrow">Objetivo de ingresos</span>
-          <h2 class="goal-title">Camino a 10.000 €/mes con opciones ajustadas</h2>
-          <p id="goalLead"></p>
-          <div class="goal-year-box sensitive"><strong id="goalYear">—</strong><span>capital de referencia al 2% mensual</span></div>
-        </div>
-        <div>
-          <div class="section-head compact"><div><span class="eyebrow">Progreso mensual</span><h2>Ritmo actual</h2></div><strong class="goal-pct sensitive" id="goalPct">—</strong></div>
-          <div class="tank sensitive" id="goalTank"></div>
-          <div class="scenario-grid sensitive" id="scenarioGrid"></div>
-        </div>
+        <div><span class="eyebrow">Objetivo de ingresos</span><h2 class="goal-title">Camino a 10.000 €/mes con opciones ajustadas</h2><p id="goalLead"></p><div class="goal-year-box sensitive"><strong id="goalYear">—</strong><span>capital de referencia al 2% mensual</span></div></div>
+        <div><div class="section-head compact"><div><span class="eyebrow">Progreso mensual</span><h2>Ritmo actual</h2></div><strong class="goal-pct sensitive" id="goalPct">—</strong></div><div class="tank sensitive" id="goalTank"></div><div class="scenario-grid sensitive" id="scenarioGrid"></div></div>
       </div>
       <div class="objective-grid sensitive" id="objectives"></div>
       <div class="stage-grid sensitive" id="incomeStages"></div>
     </section>
 
-    <footer class="footer-note">PDF IBKR YTD cerrado al 31/07/2026; valor de cartera y fondos disponibles del pantallazo tomado el 01/08/2026, correspondiente al cierre del 31/07. La rentabilidad se calcula frente al capital neto aportado de 53.975 €. La semana 29 conserva el NAV del PDF porque no se dispone del pantallazo.</footer>
+    <footer class="footer-note">PDF IBKR YTD cerrado al 06/08/2026; valor de cartera y fondos disponibles del pantallazo tomado el 07/08/2026, correspondiente al cierre del 06/08. La rentabilidad principal se calcula frente al capital neto aportado de 54.475 €. La semana 29 conserva el NAV del PDF porque no se dispone del pantallazo.</footer>
   </main>
-  <script src="/data.js?v=20260802b"></script>
-  <script src="/app.js?v=20260802b"></script>
+
+  <script src="/data.js?v=20260807a"></script>
+  <script src="/data-latest.js?v=20260807a"></script>
+  <script src="/app.js?v=20260807a"></script>
   <script>
     (function(){
       const c=window.PORTFOLIO_DATA.current,m=window.PORTFOLIO_DATA.meta;
@@ -130,49 +95,8 @@
         {label:'% opciones ajustadas / cartera',value:plainPct(optionsPct),cls:optionsPct>=0?'good':'bad'}
       ];
       document.getElementById('weeklyShareGrid').innerHTML=rows.map(x=>`<article class="weekly-share-item ${x.cls}"><div class="label">${x.label}</div><div class="value">${x.value}</div></article>`).join('');
-
-      const roundedRect=(ctx,x,y,w,h,r)=>{const rr=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();};
-      const drawCard=()=>{
-        const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;
-        const ctx=canvas.getContext('2d');
-        const bg=ctx.createLinearGradient(0,0,1080,1350);bg.addColorStop(0,'#07111f');bg.addColorStop(.52,'#0b1730');bg.addColorStop(1,'#07111f');ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1350);
-        const glow1=ctx.createRadialGradient(120,130,0,120,130,520);glow1.addColorStop(0,'rgba(34,211,238,.22)');glow1.addColorStop(1,'rgba(34,211,238,0)');ctx.fillStyle=glow1;ctx.fillRect(0,0,700,700);
-        const glow2=ctx.createRadialGradient(990,1190,0,990,1190,560);glow2.addColorStop(0,'rgba(52,211,153,.18)');glow2.addColorStop(1,'rgba(52,211,153,0)');ctx.fillStyle=glow2;ctx.fillRect(380,650,700,700);
-        ctx.globalAlpha=.1;ctx.strokeStyle='#7dd3fc';ctx.lineWidth=1;for(let x=-300;x<1400;x+=80){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x-500,1350);ctx.stroke();}ctx.globalAlpha=1;
-        roundedRect(ctx,48,48,984,1254,46);ctx.fillStyle='rgba(11,23,48,.78)';ctx.fill();ctx.strokeStyle='rgba(125,211,252,.28)';ctx.lineWidth=2;ctx.stroke();
-        ctx.fillStyle='#7dd3fc';ctx.font='800 28px system-ui, -apple-system, sans-serif';ctx.letterSpacing='4px';ctx.fillText('LUIS PORTFOLIO CONTROL',86,112);
-        ctx.fillStyle='#f8fafc';ctx.font='900 68px system-ui, -apple-system, sans-serif';ctx.fillText('MI SEMANA',86,202);ctx.fillText('EN MERCADOS',86,276);
-        roundedRect(ctx,82,310,430,62,31);ctx.fillStyle='rgba(30,41,59,.82)';ctx.fill();ctx.strokeStyle='rgba(148,163,184,.32)';ctx.stroke();ctx.fillStyle='#cbd5e1';ctx.font='700 25px system-ui, -apple-system, sans-serif';ctx.fillText(`SEMANA ${m.week}  ·  ${m.updated}`,112,350);
-        const cards=[
-          {x:82,y:418,label:'RENTABILIDAD YTD',value:signedPct(c.ytdManualPct),accent:c.ytdManualPct>=0?'#86efac':'#fda4af'},
-          {x:554,y:418,label:'OPCIONES VS SEMANA ANTERIOR',value:money(c.optionsWeekly),accent:c.optionsWeekly>=0?'#86efac':'#fda4af'},
-          {x:82,y:730,label:'FONDOS DISPONIBLES',value:plainPct(fundsPct),accent:fundsPct>=20?'#86efac':fundsPct>=10?'#fde68a':'#fda4af'},
-          {x:554,y:730,label:'OPCIONES AJUSTADAS / CARTERA',value:plainPct(optionsPct),accent:'#67e8f9'}
-        ];
-        cards.forEach(card=>{roundedRect(ctx,card.x,card.y,444,264,30);ctx.fillStyle='rgba(8,18,38,.88)';ctx.fill();ctx.strokeStyle='rgba(148,163,184,.24)';ctx.lineWidth=2;ctx.stroke();roundedRect(ctx,card.x+24,card.y+24,10,62,5);ctx.fillStyle=card.accent;ctx.fill();ctx.fillStyle='#94a3b8';ctx.font='800 21px system-ui, -apple-system, sans-serif';const words=card.label.split(' ');let line='';let lineY=card.y+58;words.forEach((word,i)=>{const test=line+word+' ';if(ctx.measureText(test).width>350&&line){ctx.fillText(line.trim(),card.x+52,lineY);line=word+' ';lineY+=29;}else{line=test;}if(i===words.length-1)ctx.fillText(line.trim(),card.x+52,lineY);});ctx.fillStyle=card.accent;ctx.font=card.value.length>10?'900 52px system-ui, -apple-system, sans-serif':'900 70px system-ui, -apple-system, sans-serif';ctx.fillText(card.value,card.x+30,card.y+205);});
-        ctx.fillStyle='#f8fafc';ctx.font='800 27px system-ui, -apple-system, sans-serif';ctx.fillText('Disciplina · Control de riesgo · Progreso real',86,1104);
-        ctx.fillStyle='#94a3b8';ctx.font='500 22px system-ui, -apple-system, sans-serif';ctx.fillText('Resumen semanal sin mostrar el valor total de la cartera',86,1150);
-        const lineGrad=ctx.createLinearGradient(86,0,994,0);lineGrad.addColorStop(0,'#34d399');lineGrad.addColorStop(.5,'#22d3ee');lineGrad.addColorStop(1,'#60a5fa');roundedRect(ctx,86,1200,908,8,4);ctx.fillStyle=lineGrad;ctx.fill();
-        ctx.fillStyle='#64748b';ctx.font='700 18px system-ui, -apple-system, sans-serif';ctx.fillText('SEGUIMIENTO PERSONAL · NO ES ASESORAMIENTO FINANCIERO',86,1255);
-        return canvas;
-      };
-      const btn=document.getElementById('weeklyShareBtn');
-      btn.addEventListener('click',async()=>{
-        const original=btn.textContent;btn.textContent='Preparando ficha…';btn.disabled=true;
-        try{
-          const canvas=drawCard();
-          const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png',1));
-          if(!blob) throw new Error('No se pudo crear la imagen');
-          const file=new File([blob],`seguimiento-semanal-${m.updated.replaceAll('/','-')}.png`,{type:'image/png'});
-          if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-            await navigator.share({title:'Mi semana en mercados',text:'Mi seguimiento semanal de cartera y opciones.',files:[file]});
-          }else{
-            const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);btn.textContent='Ficha descargada';setTimeout(()=>btn.textContent=original,1800);
-          }
-        }catch(err){if(err&&err.name!=='AbortError'){btn.textContent='No se pudo compartir';setTimeout(()=>btn.textContent=original,1800);}}
-        finally{btn.disabled=false;if(btn.textContent==='Preparando ficha…')btn.textContent=original;}
-      });
     })();
   </script>
+  <script src="/share-investor-quotes.js?v=20260807a"></script>
 </body>
 </html>
