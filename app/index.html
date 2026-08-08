@@ -10,7 +10,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#07111f">
-  <link rel="manifest" href="/manifest.webmanifest?v=20260807a">
+  <link rel="manifest" href="/manifest.webmanifest?v=20260808a">
   <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png?v=4">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=4">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=4">
@@ -22,6 +22,27 @@
   </style>
 </head>
 <body>
-  <iframe id="dash" src="/index.html?v=20260807a" title="Luis Portfolio Control"></iframe>
+  <iframe id="dash" src="/index.html?v=20260808a" title="Luis Portfolio Control"></iframe>
+  <script>
+    const dash=document.getElementById('dash');
+    dash.addEventListener('load',()=>{
+      try{
+        const doc=dash.contentDocument;
+        if(!doc) return;
+        if(!doc.getElementById('investorQuotesScript')){
+          const quotes=doc.createElement('script');
+          quotes.id='investorQuotesScript';
+          quotes.src='/share-investor-quotes.js?v=20260808a';
+          doc.body.appendChild(quotes);
+        }
+        if(!doc.getElementById('interactiveWeeklyScript')){
+          const interactive=doc.createElement('script');
+          interactive.id='interactiveWeeklyScript';
+          interactive.src='/interactive-weekly.js?v=20260808a';
+          doc.body.appendChild(interactive);
+        }
+      }catch(error){console.error('No se pudieron cargar las mejoras del dashboard',error);}
+    });
+  </script>
 </body>
 </html>
