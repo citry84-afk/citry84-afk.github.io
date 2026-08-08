@@ -17,22 +17,22 @@
   style.textContent=`
     .chart-wrap.weekly-interactive{position:relative;cursor:crosshair}
     .chart-wrap.weekly-interactive svg{touch-action:pan-y}
-    .weekly-touch-hint{position:absolute;right:12px;bottom:9px;z-index:3;padding:7px 10px;border-radius:999px;background:rgba(8,18,38,.82);border:1px solid rgba(125,211,252,.22);color:#94a3b8;font:700 11px/1 system-ui,-apple-system,sans-serif;pointer-events:none;backdrop-filter:blur(10px)}
-    .weekly-inspector{position:absolute;z-index:8;top:10px;right:10px;width:min(310px,calc(100% - 20px));padding:14px 15px;border-radius:18px;background:rgba(5,14,30,.95);border:1px solid rgba(103,232,249,.34);box-shadow:0 18px 50px rgba(0,0,0,.38);backdrop-filter:blur(16px);color:#e2e8f0;transform:translateY(-4px);opacity:0;pointer-events:none;transition:opacity .16s ease,transform .16s ease}
+    .weekly-touch-hint{position:absolute;right:12px;bottom:9px;z-index:3;padding:6px 9px;border-radius:999px;background:rgba(8,18,38,.82);border:1px solid rgba(125,211,252,.22);color:#94a3b8;font:700 10px/1 system-ui,-apple-system,sans-serif;pointer-events:none;backdrop-filter:blur(10px)}
+    .weekly-inspector{position:absolute;z-index:8;top:8px;right:8px;width:min(242px,calc(100% - 16px));box-sizing:border-box;padding:10px 11px;border-radius:15px;background:rgba(5,14,30,.94);border:1px solid rgba(103,232,249,.34);box-shadow:0 14px 36px rgba(0,0,0,.34);backdrop-filter:blur(14px);color:#e2e8f0;transform:translateY(-3px);opacity:0;pointer-events:none;transition:opacity .12s ease,transform .12s ease,left .12s ease,right .12s ease,top .12s ease}
     .weekly-inspector.show{opacity:1;transform:translateY(0);pointer-events:auto}
-    .weekly-inspector-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:11px}
-    .weekly-inspector-title{font:900 18px/1.1 system-ui,-apple-system,sans-serif;color:#f8fafc}
-    .weekly-inspector-date{margin-top:4px;font:700 11px/1 system-ui,-apple-system,sans-serif;color:#7dd3fc;letter-spacing:.04em;text-transform:uppercase}
-    .weekly-inspector-close{appearance:none;border:0;background:transparent;color:#94a3b8;font-size:20px;line-height:1;padding:0 0 4px 8px;cursor:pointer}
-    .weekly-inspector-grid{display:grid;grid-template-columns:1fr;gap:7px}
-    .weekly-inspector-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 10px;border-radius:12px;background:rgba(15,23,42,.7);border:1px solid rgba(148,163,184,.12)}
-    .weekly-inspector-row span{font:700 12px/1.15 system-ui,-apple-system,sans-serif;color:#94a3b8}
-    .weekly-inspector-row strong{font:900 16px/1 system-ui,-apple-system,sans-serif;color:#f8fafc;white-space:nowrap}
+    .weekly-inspector-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:7px}
+    .weekly-inspector-title{font:900 15px/1.05 system-ui,-apple-system,sans-serif;color:#f8fafc}
+    .weekly-inspector-date{margin-top:3px;font:700 9px/1 system-ui,-apple-system,sans-serif;color:#7dd3fc;letter-spacing:.04em;text-transform:uppercase}
+    .weekly-inspector-close{appearance:none;border:0;background:transparent;color:#94a3b8;font-size:18px;line-height:1;padding:0 0 2px 6px;cursor:pointer}
+    .weekly-inspector-grid{display:grid;grid-template-columns:1fr;gap:5px}
+    .weekly-inspector-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 8px;border-radius:10px;background:rgba(15,23,42,.68);border:1px solid rgba(148,163,184,.11)}
+    .weekly-inspector-row span{font:700 10px/1.12 system-ui,-apple-system,sans-serif;color:#94a3b8;max-width:58%}
+    .weekly-inspector-row strong{font:900 13px/1 system-ui,-apple-system,sans-serif;color:#f8fafc;white-space:nowrap}
     .weekly-inspector-row strong.pos{color:#86efac}.weekly-inspector-row strong.neg{color:#fda4af}
     .weekly-marker-line{stroke:#67e8f9;stroke-width:1.5;stroke-dasharray:4 5;opacity:.72;pointer-events:none}
     .weekly-marker-halo{fill:rgba(103,232,249,.18);stroke:#67e8f9;stroke-width:2;pointer-events:none}
     .weekly-marker-dot{fill:#f8fafc;stroke:#22d3ee;stroke-width:3;pointer-events:none}
-    @media(max-width:720px){.weekly-inspector{top:8px;right:8px;width:calc(100% - 16px);box-sizing:border-box}.weekly-touch-hint{font-size:10px}.weekly-inspector-row{padding:8px 9px}}
+    @media(max-width:720px){.weekly-inspector{width:min(220px,calc(100% - 16px));padding:9px 10px;border-radius:14px}.weekly-touch-hint{font-size:9px}.weekly-inspector-row{padding:6px 7px}.weekly-inspector-row span{font-size:9px}.weekly-inspector-row strong{font-size:12px}}
   `;
   if(!document.getElementById(style.id)) document.head.appendChild(style);
 
@@ -86,7 +86,29 @@
     svg.append(line,halo,dot);
   }
 
-  function showInspector(sourceSvg,idx){
+  function positionInspector(ui,event,idx,sourceSvg){
+    const {wrap,box}=ui;
+    const wrapRect=wrap.getBoundingClientRect();
+    const svgRect=sourceSvg.getBoundingClientRect();
+    const pt=pointFor(sourceSvg,idx,charts.find(c=>c.id===sourceSvg.id)?.value||((w)=>w.saldo));
+    const eventX=event&&Number.isFinite(event.clientX)?event.clientX-wrapRect.left:(svgRect.left-wrapRect.left)+(pt.x/(sourceSvg.viewBox.baseVal.width||sourceSvg.clientWidth||1))*svgRect.width;
+    const eventY=event&&Number.isFinite(event.clientY)?event.clientY-wrapRect.top:(svgRect.top-wrapRect.top)+(pt.y/(sourceSvg.viewBox.baseVal.height||sourceSvg.clientHeight||1))*svgRect.height;
+
+    box.style.left='auto';box.style.right='auto';
+    const gap=10;
+    if(eventX<wrapRect.width/2){box.style.right=`${gap}px`;}
+    else{box.style.left=`${gap}px`;}
+
+    requestAnimationFrame(()=>{
+      const bh=box.offsetHeight||130;
+      const maxTop=Math.max(8,wrapRect.height-bh-8);
+      let top=eventY-bh/2;
+      top=Math.max(8,Math.min(maxTop,top));
+      box.style.top=`${top}px`;
+    });
+  }
+
+  function showInspector(sourceSvg,idx,event){
     const data=weeks(),w=data[idx]; if(!w) return;
     const ui=ensureUI(sourceSvg); if(!ui) return;
     const box=ui.box;
@@ -94,16 +116,17 @@
     box.querySelector('.weekly-inspector-date').textContent=fmtDate(w.date);
     const rows=[
       ['Rentabilidad YTD',fmtPct(w.ytdPct),w.ytdPct>=0?'pos':'neg'],
-      ['Opciones de la semana',fmtEUR(w.weeklyOptions),w.weeklyOptions>=0?'pos':'neg'],
-      ['Opciones ajustadas acumuladas',fmtEUR(w.optionsYtd),w.optionsYtd>=0?'pos':'neg']
+      ['Opciones semana',fmtEUR(w.weeklyOptions),w.weeklyOptions>=0?'pos':'neg'],
+      ['Acumulado ajustado',fmtEUR(w.optionsYtd),w.optionsYtd>=0?'pos':'neg']
     ];
     box.querySelector('.weekly-inspector-grid').innerHTML=rows.map(r=>`<div class="weekly-inspector-row"><span>${r[0]}</span><strong class="${r[2]}">${r[1]}</strong></div>`).join('');
     box.classList.add('show');
+    positionInspector(ui,event,idx,sourceSvg);
   }
 
-  function selectWeek(idx,sourceSvg){
+  function selectWeek(idx,sourceSvg,event){
     charts.forEach(cfg=>{const svg=document.getElementById(cfg.id);if(svg) drawMarker(svg,idx,cfg.value);});
-    showInspector(sourceSvg,idx);
+    showInspector(sourceSvg,idx,event);
   }
 
   function indexFromEvent(svg,event){
@@ -125,11 +148,13 @@
         const ui=ensureUI(svg);if(!ui) return;
         ui.box.querySelector('.weekly-inspector-title').textContent='Detalle semanal 2026';
         ui.box.querySelector('.weekly-inspector-date').textContent='Selecciona solo 2026';
-        ui.box.querySelector('.weekly-inspector-grid').innerHTML='<div class="weekly-inspector-row"><span>Para relacionar YTD y opciones</span><strong>2026</strong></div>';
-        ui.box.classList.add('show');return;
+        ui.box.querySelector('.weekly-inspector-grid').innerHTML='<div class="weekly-inspector-row"><span>Relacionar YTD y opciones</span><strong>2026</strong></div>';
+        ui.box.classList.add('show');
+        positionInspector(ui,e,0,svg);
+        return;
       }
-      selectWeek(indexFromEvent(svg,e),svg);
+      selectWeek(indexFromEvent(svg,e),svg,e);
     });
-    svg.addEventListener('mousemove',(e)=>{if(window.matchMedia('(hover:hover)').matches&&only2026Selected()) selectWeek(indexFromEvent(svg,e),svg);});
+    svg.addEventListener('mousemove',(e)=>{if(window.matchMedia('(hover:hover)').matches&&only2026Selected()) selectWeek(indexFromEvent(svg,e),svg,e);});
   });
 })();
