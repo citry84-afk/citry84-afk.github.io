@@ -1,17 +1,17 @@
 const teams = {
- FWC:{name:'Especiales FWC',group:'Especiales'},
- MEX:{name:'México',group:'Grupo A'},RSA:{name:'Sudáfrica',group:'Grupo A'},KOR:{name:'Corea del Sur',group:'Grupo A'},CZE:{name:'Chequia',group:'Grupo A'},
- CAN:{name:'Canadá',group:'Grupo B'},BIH:{name:'Bosnia-Herzegovina',group:'Grupo B'},QAT:{name:'Qatar',group:'Grupo B'},SUI:{name:'Suiza',group:'Grupo B'},
- BRA:{name:'Brasil',group:'Grupo C'},MAR:{name:'Marruecos',group:'Grupo C'},HAI:{name:'Haití',group:'Grupo C'},SCO:{name:'Escocia',group:'Grupo C'},
- USA:{name:'Estados Unidos',group:'Grupo D'},PAR:{name:'Paraguay',group:'Grupo D'},AUS:{name:'Australia',group:'Grupo D'},TUR:{name:'Turquía',group:'Grupo D'},
- GER:{name:'Alemania',group:'Grupo E'},CUW:{name:'Curazao',group:'Grupo E'},CIV:{name:'Costa de Marfil',group:'Grupo E'},ECU:{name:'Ecuador',group:'Grupo E'},
- NED:{name:'Países Bajos',group:'Grupo F'},JPN:{name:'Japón',group:'Grupo F'},SWE:{name:'Suecia',group:'Grupo F'},TUN:{name:'Túnez',group:'Grupo F'},
- BEL:{name:'Bélgica',group:'Grupo G'},EGY:{name:'Egipto',group:'Grupo G'},IRN:{name:'Irán',group:'Grupo G'},NZL:{name:'Nueva Zelanda',group:'Grupo G'},
- ESP:{name:'España',group:'Grupo H'},CPV:{name:'Cabo Verde',group:'Grupo H'},KSA:{name:'Arabia Saudí',group:'Grupo H'},URU:{name:'Uruguay',group:'Grupo H'},
- FRA:{name:'Francia',group:'Grupo I'},SEN:{name:'Senegal',group:'Grupo I'},IRQ:{name:'Irak',group:'Grupo I'},NOR:{name:'Noruega',group:'Grupo I'},
- ARG:{name:'Argentina',group:'Grupo J'},ALG:{name:'Argelia',group:'Grupo J'},AUT:{name:'Austria',group:'Grupo J'},JOR:{name:'Jordania',group:'Grupo J'},
- POR:{name:'Portugal',group:'Grupo K'},COD:{name:'RD Congo',group:'Grupo K'},UZB:{name:'Uzbekistán',group:'Grupo K'},COL:{name:'Colombia',group:'Grupo K'},
- ENG:{name:'Inglaterra',group:'Grupo L'},CRO:{name:'Croacia',group:'Grupo L'},GHA:{name:'Ghana',group:'Grupo L'},PAN:{name:'Panamá',group:'Grupo L'}
+ FWC:{name:'Especiales FWC',group:'Especiales',flag:'🏆'},
+ MEX:{name:'México',group:'Grupo A',flag:'🇲🇽'},RSA:{name:'Sudáfrica',group:'Grupo A',flag:'🇿🇦'},KOR:{name:'Corea del Sur',group:'Grupo A',flag:'🇰🇷'},CZE:{name:'Chequia',group:'Grupo A',flag:'🇨🇿'},
+ CAN:{name:'Canadá',group:'Grupo B',flag:'🇨🇦'},BIH:{name:'Bosnia-Herzegovina',group:'Grupo B',flag:'🇧🇦'},QAT:{name:'Qatar',group:'Grupo B',flag:'🇶🇦'},SUI:{name:'Suiza',group:'Grupo B',flag:'🇨🇭'},
+ BRA:{name:'Brasil',group:'Grupo C',flag:'🇧🇷'},MAR:{name:'Marruecos',group:'Grupo C',flag:'🇲🇦'},HAI:{name:'Haití',group:'Grupo C',flag:'🇭🇹'},SCO:{name:'Escocia',group:'Grupo C',flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿'},
+ USA:{name:'Estados Unidos',group:'Grupo D',flag:'🇺🇸'},PAR:{name:'Paraguay',group:'Grupo D',flag:'🇵🇾'},AUS:{name:'Australia',group:'Grupo D',flag:'🇦🇺'},TUR:{name:'Turquía',group:'Grupo D',flag:'🇹🇷'},
+ GER:{name:'Alemania',group:'Grupo E',flag:'🇩🇪'},CUW:{name:'Curazao',group:'Grupo E',flag:'🇨🇼'},CIV:{name:'Costa de Marfil',group:'Grupo E',flag:'🇨🇮'},ECU:{name:'Ecuador',group:'Grupo E',flag:'🇪🇨'},
+ NED:{name:'Países Bajos',group:'Grupo F',flag:'🇳🇱'},JPN:{name:'Japón',group:'Grupo F',flag:'🇯🇵'},SWE:{name:'Suecia',group:'Grupo F',flag:'🇸🇪'},TUN:{name:'Túnez',group:'Grupo F',flag:'🇹🇳'},
+ BEL:{name:'Bélgica',group:'Grupo G',flag:'🇧🇪'},EGY:{name:'Egipto',group:'Grupo G',flag:'🇪🇬'},IRN:{name:'Irán',group:'Grupo G',flag:'🇮🇷'},NZL:{name:'Nueva Zelanda',group:'Grupo G',flag:'🇳🇿'},
+ ESP:{name:'España',group:'Grupo H',flag:'🇪🇸'},CPV:{name:'Cabo Verde',group:'Grupo H',flag:'🇨🇻'},KSA:{name:'Arabia Saudí',group:'Grupo H',flag:'🇸🇦'},URU:{name:'Uruguay',group:'Grupo H',flag:'🇺🇾'},
+ FRA:{name:'Francia',group:'Grupo I',flag:'🇫🇷'},SEN:{name:'Senegal',group:'Grupo I',flag:'🇸🇳'},IRQ:{name:'Irak',group:'Grupo I',flag:'🇮🇶'},NOR:{name:'Noruega',group:'Grupo I',flag:'🇳🇴'},
+ ARG:{name:'Argentina',group:'Grupo J',flag:'🇦🇷'},ALG:{name:'Argelia',group:'Grupo J',flag:'🇩🇿'},AUT:{name:'Austria',group:'Grupo J',flag:'🇦🇹'},JOR:{name:'Jordania',group:'Grupo J',flag:'🇯🇴'},
+ POR:{name:'Portugal',group:'Grupo K',flag:'🇵🇹'},COD:{name:'RD Congo',group:'Grupo K',flag:'🇨🇩'},UZB:{name:'Uzbekistán',group:'Grupo K',flag:'🇺🇿'},COL:{name:'Colombia',group:'Grupo K',flag:'🇨🇴'},
+ ENG:{name:'Inglaterra',group:'Grupo L',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'},CRO:{name:'Croacia',group:'Grupo L',flag:'🇭🇷'},GHA:{name:'Ghana',group:'Grupo L',flag:'🇬🇭'},PAN:{name:'Panamá',group:'Grupo L',flag:'🇵🇦'}
 };
 
 const initial = {
