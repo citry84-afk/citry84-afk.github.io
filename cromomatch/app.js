@@ -1,3 +1,4 @@
+document.head.insertAdjacentHTML("beforeend",'<link rel="stylesheet" href="ultra.css">');
 const ALBUM = {
   id:"liga-demo-v1",
   title:"Liga · Demo MVP",
@@ -58,6 +59,22 @@ function toast(msg){
   const t=$("#toast");t.textContent=msg;t.classList.add("show");
   clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("show"),1800);
 }
+function haptic(pattern=12){try{navigator.vibrate&&navigator.vibrate(pattern)}catch(e){}}
+function celebrate(){
+  const fx=$("#matchFx"); if(!fx)return; fx.innerHTML="";
+  const palette=["#8b5cf6","#ec4899","#38bdf8","#34d399","#f59e0b"];
+  for(let i=0;i<34;i++){
+    const p=document.createElement("i");p.className="fx-piece";
+    p.style.left=(8+Math.random()*84)+"%";p.style.background=palette[i%palette.length];
+    p.style.setProperty("--dur",(1.2+Math.random()*.9)+"s");p.style.setProperty("--drift",(-90+Math.random()*180)+"px");p.style.setProperty("--rot",Math.round(Math.random()*180)+"deg");
+    p.style.animationDelay=(Math.random()*.15)+"s";fx.appendChild(p);
+  }
+  for(let i=0;i<14;i++){
+    const s=document.createElement("i");s.className="fx-spark";s.style.left="50%";s.style.top="42%";s.style.background=palette[i%palette.length];s.style.color=palette[i%palette.length];
+    const angle=Math.PI*2*i/14,dist=65+Math.random()*100;s.style.setProperty("--x",Math.cos(angle)*dist+"px");s.style.setProperty("--y",Math.sin(angle)*dist+"px");s.style.animationDelay=(Math.random()*.08)+"s";fx.appendChild(s);
+  }
+  setTimeout(()=>fx.innerHTML="",2300);haptic([18,35,18]);
+}
 function go(view){
   $$(".view").forEach(v=>v.classList.toggle("active",v.id===view));
   $$(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.go===view));
@@ -66,7 +83,7 @@ function go(view){
 }
 function renderStats(){
   const owned=totalOwned(),miss=catalog.length-owned,reps=totalRepeats();
-  $("#ownedCount").textContent=owned;$("#missingCount").textContent=miss;$("#repeatCount").textContent=reps;
+  [["#ownedCount",owned],["#missingCount",miss],["#repeatCount",reps]].forEach(([sel,val])=>{const el=$(sel);if(el.textContent!==String(val)){el.textContent=val;el.classList.remove("stat-pulse");void el.offsetWidth;el.classList.add("stat-pulse");}});
   const pct=Math.round(owned/catalog.length*100);
   $("#completionPct").textContent=pct+"%";
   $("#progressRing").style.setProperty("--pct",pct+"%");
@@ -101,7 +118,7 @@ function renderAlbum(){
       const row=document.createElement("div");row.className=`sticker-row ${statusOf(qty)}`;
       row.innerHTML=`<div class="sticker-status"></div><div class="sticker-main"><b>${s.id}</b><small>${qty===0?"Me falta":qty===1?"Lo tengo":`Tengo ${qty} · ${qty-1} repe${qty-1>1?"s":""}`}</small></div><div class="counter"><button data-d="-1">−</button><b>${qty}</b><button data-d="1">+</button></div>`;
       row.querySelectorAll("button").forEach(b=>b.onclick=()=>{
-        const d=+b.dataset.d;state.counts[s.id]=Math.max(0,Math.min(MAX,(state.counts[s.id]||0)+d));saveState();
+        const d=+b.dataset.d;state.counts[s.id]=Math.max(0,Math.min(MAX,(state.counts[s.id]||0)+d));haptic(8);saveState();
       });
       list.appendChild(row);
     });
@@ -135,98 +152,151 @@ function unpackCounts(encoded){
   });
   return counts;
 }
-function makePayload(){return {v:1,a:ALBUM.id,n:state.owner||"Coleccionista",s:packCounts(state.counts)}}
-function encodePayload(p){return bytesToB64url(new TextEncoder().encode(JSON.stringify(p)))}
+function makePayload(){
+  return {v:1,a:ALBUM.id,n:state.owner||"Coleccionista",s:packCounts(state.counts)};
+}
+function encodePayload(p){
+  const text=JSON.stringify(p);
+  return bytesToB64url(new TextEncoder().encode(text));
+}
 function decodePayload(encoded){
-  const text=new TextDecoder().decode(b64urlToBytes(encoded));
+  const bytes=b64urlToBytes(encoded);
+  const text=new TextDecoder().decode(bytes);
   const p=JSON.parse(text);
   if(p.v!==1||p.a!==ALBUM.id||!p.s)throw new Error("QR de otro álbum o versión");
   return {owner:p.n||"Coleccionista",counts:unpackCounts(p.s)};
 }
-function publicBase(){return location.origin+location.pathname.replace(/index\.html$/g,"")}
-function makeSwapUrl(){return `${publicBase()}?swap=${encodeURIComponent(encodePayload(makePayload()))}`}
+function publicBase(){
+  return location.origin+location.pathname.replace(/index\.html$/g,"");
+}
+function makeSwapUrl(){
+  return `${publicBase()}?swap=${encodeURIComponent(encodePayload(makePayload()))}`;
+}
 function refreshQr(){
   $("#qrOwnerTitle").textContent=state.owner||"Coleccionista";
   const box=$("#qrBox");box.innerHTML="";
   const url=makeSwapUrl();
-  if(window.QRCode){new QRCode(box,{text:url,width:230,height:230,colorDark:"#111827",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M})}
-  else{box.innerHTML='<div class="info-card"><b>No se pudo cargar el generador QR.</b><p>Puedes usar “Compartir enlace”.</p></div>'}
+  if(window.QRCode){
+    new QRCode(box,{text:url,width:230,height:230,colorDark:"#111827",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
+  }else{
+    box.innerHTML='<div class="info-card"><b>No se pudo cargar el generador QR.</b><p>Puedes usar “Compartir enlace”.</p></div>';
+  }
 }
 function compareWith(snapshot){
   incomingSnapshot=snapshot;
-  const theirRepeats=repeatIds(snapshot.counts),myMissing=new Set(missingIds()),myRepeats=repeatIds(),theirMissing=new Set(missingIds(snapshot.counts));
-  const receive=theirRepeats.filter(id=>myMissing.has(id)),give=myRepeats.filter(id=>theirMissing.has(id));
+  const theirRepeats=repeatIds(snapshot.counts);
+  const myMissing=new Set(missingIds());
+  const myRepeats=repeatIds();
+  const theirMissing=new Set(missingIds(snapshot.counts));
+  const receive=theirRepeats.filter(id=>myMissing.has(id));
+  const give=myRepeats.filter(id=>theirMissing.has(id));
   showMatch(snapshot.owner,receive,give);
 }
-function pretty(id){const s=stickerById(id);return s?`${s.emoji} ${id}`:id}
-function chips(ids){return ids.length?ids.map(id=>`<span class="match-chip">${pretty(id)}</span>`).join(""):'<span class="match-chip">Ninguno</span>'}
+function pretty(id){
+  const s=stickerById(id);return s?`${s.emoji} ${id}`:id;
+}
+function chips(ids){
+  return ids.length?ids.map(id=>`<span class="match-chip">${pretty(id)}</span>`).join(""):'<span class="match-chip">Ninguno</span>';
+}
 function showMatch(owner,receive,give){
   go("swapView");
   $("#matchResult").hidden=false;
   $("#matchTitle").textContent=`Match con ${owner}`;
   $("#matchSubtitle").textContent=`${receive.length} te sirven · ${give.length} tuyos le sirven`;
-  $("#receiveList").innerHTML=chips(receive);$("#giveList").innerHTML=chips(give);$("#proposalBox").hidden=true;
+  $("#receiveList").innerHTML=chips(receive);
+  $("#giveList").innerHTML=chips(give);
+  $("#proposalBox").hidden=true;
+  if(receive.length||give.length)celebrate();
   $("#matchResult").scrollIntoView({behavior:"smooth",block:"start"});
   $("#bestTradeBtn").onclick=()=>{
-    const n=Math.min(receive.length,give.length),r=receive.slice(0,n),g=give.slice(0,n),box=$("#proposalBox");box.hidden=false;
-    if(!n){box.innerHTML='<h3>No hay intercambio 1×1 directo</h3><p>Uno de los dos lados no tiene cromos útiles para el otro.</p>';return}
+    haptic(12);
+    const n=Math.min(receive.length,give.length);
+    const r=receive.slice(0,n),g=give.slice(0,n),box=$("#proposalBox");
+    box.hidden=false;
+    if(!n){box.innerHTML='<h3>No hay intercambio 1×1 directo</h3><p>Uno de los dos lados no tiene cromos útiles para el otro.</p>';return;}
     box.innerHTML=`<h3>⚡ Propuesta: ${n} × ${n}</h3><div class="proposal-grid"><div class="proposal-box"><small>Tú recibes</small><div class="match-chips">${chips(r)}</div></div><div class="proposal-box"><small>Tú entregas</small><div class="match-chips">${chips(g)}</div></div></div><p style="font-size:11px;color:#6b7280;margin-bottom:0">En la siguiente versión, al confirmar, ambos móviles actualizarán el álbum sincronizado.</p>`;
     box.scrollIntoView({behavior:"smooth",block:"center"});
   };
 }
 function processSwapText(text){
   try{
-    const raw=text.trim();let code=raw;
-    if(raw.includes("?swap="))code=new URL(raw).searchParams.get("swap")||"";
-    else if(raw.startsWith("http"))code=new URL(raw).searchParams.get("swap")||"";
+    const raw=text.trim();
+    let code=raw;
+    if(raw.includes("?swap=")){
+      code=new URL(raw).searchParams.get("swap")||"";
+    }else if(raw.startsWith("http")){
+      code=new URL(raw).searchParams.get("swap")||"";
+    }
     compareWith(decodePayload(decodeURIComponent(code)));
-  }catch(e){toast("No reconozco ese QR/enlace")}
+  }catch(e){toast("No reconozco ese QR/enlace");}
 }
 async function startScanner(){
-  if(!window.Html5Qrcode){toast("Escáner no disponible. Usa la cámara normal.");return}
+  if(!window.Html5Qrcode){toast("Escáner no disponible. Usa la cámara normal.");return;}
   try{
-    if(html5Qr){await html5Qr.stop().catch(()=>{});html5Qr.clear()}
+    if(html5Qr){await html5Qr.stop().catch(()=>{});html5Qr.clear();}
     html5Qr=new Html5Qrcode("reader");
-    await html5Qr.start({facingMode:"environment"},{fps:10,qrbox:{width:240,height:240}},async decoded=>{await html5Qr.stop().catch(()=>{});processSwapText(decoded)},()=>{});
+    await html5Qr.start({facingMode:"environment"},{fps:10,qrbox:{width:240,height:240}},async decoded=>{
+      await html5Qr.stop().catch(()=>{});
+      processSwapText(decoded);
+    },()=>{});
     $("#startScannerBtn").textContent="Escaneando…";
-  }catch(e){toast("No pude abrir la cámara")}
+  }catch(e){toast("No pude abrir la cámara");}
 }
 function setSwapTab(which){
   $$(".swap-tab").forEach(b=>b.classList.toggle("active",b.dataset.swap===which));
-  $("#showQrPanel").classList.toggle("active",which==="show");$("#scanQrPanel").classList.toggle("active",which==="scan");
+  $("#showQrPanel").classList.toggle("active",which==="show");
+  $("#scanQrPanel").classList.toggle("active",which==="scan");
   if(which==="show")refreshQr();
 }
 function showNameModal(){
   $("#modalTitle").textContent="Tu nombre para intercambios";
   $("#modalBody").innerHTML=`<input id="modalNameInput" maxlength="28" value="${(state.owner||"").replace(/"/g,"&quot;")}" placeholder="Ej. Luis">`;
-  $("#modal").hidden=false;setTimeout(()=>$("#modalNameInput").focus(),80);
-  $("#modalOk").onclick=()=>{state.owner=$("#modalNameInput").value.trim()||"Coleccionista";saveState();$("#modal").hidden=true;refreshQr()};
+  $("#modal").hidden=false;
+  setTimeout(()=>$("#modalNameInput").focus(),80);
+  $("#modalOk").onclick=()=>{state.owner=$("#modalNameInput").value.trim()||"Coleccionista";saveState();$("#modal").hidden=true;refreshQr();};
 }
 function exportState(){
   const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
-  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="cromomatch-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="cromomatch-backup.json";a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 function importState(file){
-  const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(o.albumId!==ALBUM.id||!o.counts)throw 0;state=o;saveState();toast("Colección importada ✅")}catch(e){toast("Archivo no válido")}};r.readAsText(file);
+  const r=new FileReader();r.onload=()=>{
+    try{const o=JSON.parse(r.result);if(o.albumId!==ALBUM.id||!o.counts)throw 0;state=o;saveState();toast("Colección importada ✅");}
+    catch(e){toast("Archivo no válido");}
+  };r.readAsText(file);
 }
-function renderAll(){renderStats();renderAlbum();$("#ownerNameInput").value=state.owner||"";$("#qrOwnerTitle").textContent=state.owner||"Coleccionista"}
+function renderAll(){
+  renderStats();renderAlbum();
+  $("#ownerNameInput").value=state.owner||"";
+  $("#qrOwnerTitle").textContent=state.owner||"Coleccionista";
+}
 function init(){
-  $$('[data-go]').forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
-  $("#quickQrBtn").onclick=()=>{go("swapView");setSwapTab("show")};
+  $$("[data-go]").forEach(b=>b.addEventListener("click",()=>{haptic(6);go(b.dataset.go)}));
+  $("#quickQrBtn").onclick=()=>{go("swapView");setSwapTab("show");};
   $$(".swap-tab").forEach(b=>b.onclick=()=>setSwapTab(b.dataset.swap));
   $("#searchSticker").oninput=renderAlbum;$("#clubFilter").onchange=renderAlbum;$("#statusFilter").onchange=renderAlbum;
   $("#editNameBtn").onclick=showNameModal;$("#modalCancel").onclick=()=>$("#modal").hidden=true;
-  $("#shareQrLinkBtn").onclick=async()=>{const url=makeSwapUrl();if(navigator.share){try{await navigator.share({title:"CromoMatch",text:"Compara tu colección con la mía",url});return}catch(e){}}await navigator.clipboard.writeText(url);toast("Enlace copiado")};
-  $("#copyQrLinkBtn").onclick=async()=>{await navigator.clipboard.writeText(makeSwapUrl());toast("Enlace copiado")};
-  $("#startScannerBtn").onclick=startScanner;$("#processPasteBtn").onclick=()=>processSwapText($("#swapPaste").value);
-  $("#saveOwnerNameBtn").onclick=()=>{state.owner=$("#ownerNameInput").value.trim()||"Coleccionista";saveState();toast("Nombre guardado")};
-  $("#resetDemoBtn").onclick=()=>{if(confirm("¿Reiniciar la colección de demostración?")){state.counts=seedCounts();saveState();toast("Demo reiniciada")}};
+  $("#shareQrLinkBtn").onclick=async()=>{
+    const url=makeSwapUrl();
+    if(navigator.share){try{await navigator.share({title:"CromoMatch",text:"Compara tu colección con la mía",url});return}catch(e){}}
+    await navigator.clipboard.writeText(url);toast("Enlace copiado");
+  };
+  $("#copyQrLinkBtn").onclick=async()=>{await navigator.clipboard.writeText(makeSwapUrl());toast("Enlace copiado");};
+  $("#startScannerBtn").onclick=startScanner;
+  $("#processPasteBtn").onclick=()=>processSwapText($("#swapPaste").value);
+  $("#saveOwnerNameBtn").onclick=()=>{state.owner=$("#ownerNameInput").value.trim()||"Coleccionista";saveState();toast("Nombre guardado");};
+  $("#resetDemoBtn").onclick=()=>{if(confirm("¿Reiniciar la colección de demostración?")){state.counts=seedCounts();saveState();toast("Demo reiniciada");}};
   $("#exportBtn").onclick=exportState;$("#importBtn").onclick=()=>$("#importFile").click();$("#importFile").onchange=e=>e.target.files[0]&&importState(e.target.files[0]);
-  window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;$("#installBtn").hidden=false});
-  $("#installBtn").onclick=async()=>{if(deferredInstall){deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$("#installBtn").hidden=true}};
+  window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;$("#installBtn").hidden=false;});
+  $("#installBtn").onclick=async()=>{if(deferredInstall){deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$("#installBtn").hidden=true;}};
   if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
   renderAll();refreshQr();
+
   const incoming=new URLSearchParams(location.search).get("swap");
-  if(incoming){try{compareWith(decodePayload(decodeURIComponent(incoming)));setSwapTab("show")}catch(e){toast("El enlace de intercambio no es válido")}}
+  if(incoming){
+    try{compareWith(decodePayload(decodeURIComponent(incoming)));setSwapTab("show");}
+    catch(e){toast("El enlace de intercambio no es válido");}
+  }
 }
 document.addEventListener("DOMContentLoaded",init);
