@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1f3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cromos 2026">
+<title>Álbum Mundial 2026 · Intercambio</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="eyebrow">Control de colección</div>
+  <h1>🌍 Álbum Mundial 2026</h1>
+  <div class="sub">Lista rápida para encontrar, marcar y cambiar cromos.</div>
+  <div class="stats">
+    <div class="stat"><b id="statMissing">90</b><span>faltan confirmados</span></div>
+    <div class="stat"><b id="statUncertain">2</b><span>por confirmar</span></div>
+    <div class="stat"><b id="statRepeats">55</b><span>repes disponibles</span></div>
+  </div>
+</header>
+<main>
+  <section class="quick">
+    <h2>⚡ Comprobar un cromo</h2>
+    <div class="quickrow"><input id="quickCode" placeholder="Ej. GER 1, FWC 15…" autocomplete="off"><button class="btn" id="checkBtn">Comprobar</button></div>
+    <div id="quickResult"></div>
+  </section>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="missing">Faltan</button>
+    <button class="tab" data-tab="repeats">Repes</button>
+    <button class="tab" data-tab="exchange">Cambio</button>
+    <button class="tab" data-tab="settings">Más</button>
+  </nav>
+
+  <section id="missing" class="panel active">
+    <div class="toolbar"><input id="missingSearch" placeholder="Buscar selección o código…"><button class="btn secondary" id="showUncertain">Ver dudosos</button></div>
+    <div id="missingGroups" class="groups"></div>
+  </section>
+
+  <section id="repeats" class="panel">
+    <div class="toolbar"><input id="repeatSearch" placeholder="Buscar selección o código…"></div>
+    <div id="repeatGroups" class="groups"></div>
+  </section>
+
+  <section id="exchange" class="panel">
+    <div class="exchange-card">
+      <h2>🤝 Comparar con otra persona</h2>
+      <div class="note">Pega códigos separados por comas, espacios o saltos de línea. Ejemplo: <b>GER 1, ESP 9, FWC15</b>.</div>
+      <label>La otra persona TIENE</label>
+      <textarea id="otherHas" placeholder="GER 1, ARG 10, ESP 18…"></textarea>
+      <label>La otra persona BUSCA</label>
+      <textarea id="otherNeeds" placeholder="FRA 3, CAN 14, TUR 5…"></textarea>
+      <button class="btn" id="compareBtn" style="margin-top:10px;width:100%">Calcular intercambio</button>
+      <div class="matches">
+        <div class="matchbox"><h3 class="ok">✅ Me puede dar</h3><div id="theyGive" class="matchlist"><span class="muted">—</span></div></div>
+        <div class="matchbox"><h3 class="bad">🎁 Yo le puedo dar</h3><div id="iGive" class="matchlist"><span class="muted">—</span></div></div>
+      </div>
+      <div id="tradeSummary" class="note" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <section id="settings" class="panel">
+    <div class="exchange-card camera-card">
+      <h2>📷 Revisar cromos con una foto</h2>
+      <div class="note">Haz una foto desde el móvil y compártela con ChatGPT. Al abrirla allí, puedo compararla con vuestra lista y decirte cuáles sirven.</div>
+      <input id="photoInput" type="file" accept="image/*" capture="environment" hidden>
+      <button class="btn camera-btn" id="photoBtn" style="margin-top:10px">📷 Hacer foto de los cromos</button>
+      <div class="photo-preview" id="photoPreview"><img id="photoImg" alt="Foto de cromos"><div class="photo-actions"><button class="btn" id="sharePhotoBtn">Compartir foto</button><button class="btn secondary" id="clearPhotoBtn">Otra foto</button></div><div class="note" style="margin-top:8px">En iPhone, elige <b>ChatGPT</b> en la hoja de compartir y envíala en este mismo chat.</div></div>
+    </div>
+    <div class="exchange-card">
+      <h2>➕ Añadir / corregir</h2>
+      <div class="note">Puedes añadir un nuevo cromo a faltantes o a repetidos sin editar el archivo.</div>
+      <div class="quickrow" style="margin-top:10px"><input id="addCode" placeholder="Ej. MEX 7" style="flex:1;border:1px solid var(--line);border-radius:12px;padding:12px;text-transform:uppercase"><button class="btn secondary" id="addMissingBtn">Falta</button><button class="btn" id="addRepeatBtn">Repe</button></div>
+    </div>
+    <div class="exchange-card settings-grid">
+      <h2>💾 Datos</h2>
+      <button class="btn secondary" id="copyMissingBtn">Copiar lista de faltantes</button>
+      <button class="btn secondary" id="copyRepeatsBtn">Copiar lista de repes</button>
+      <button class="btn secondary" id="exportBtn">Exportar copia de seguridad</button>
+      <button class="btn secondary" id="importBtn">Importar copia en este móvil</button>
+      <input id="importInput" type="file" accept="application/json,.json" hidden>
+      <button class="btn danger" id="resetBtn">Restaurar listado inicial</button>
+      <div class="note">Los cambios se guardan en este dispositivo usando almacenamiento local del navegador.</div>
+      <div class="install-note">📱 <b>Consejo:</b> en iPhone abre esta web en Safari → Compartir → <b>Añadir a pantalla de inicio</b>. Quedará como una app.</div>
+    </div>
+  </section>
+</main>
+</div>
+
+<div class="bottom"><div class="bottomin"><button class="btn secondary" id="shareMissing">📤 Compartir faltantes</button><button class="btn" id="shareRepeats">🔁 Compartir repes</button></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script src="app-core.js"></script>
+<script src="app-ui.js"></script>
+<script src="app-actions.js"></script>
+</body>
+</html>
