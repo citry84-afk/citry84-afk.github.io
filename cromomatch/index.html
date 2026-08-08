@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CromoMatch">
+  <title>CromoMatch · Intercambia cromos al instante</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app" class="app-shell">
+  <header class="hero">
+    <div class="brand-row">
+      <div class="brand-mark">CM</div>
+      <div><div class="eyebrow">Tu colección, conectada</div><h1>CromoMatch</h1></div>
+      <button class="icon-btn" id="installBtn" title="Instalar app" hidden>⬇️</button>
+    </div>
+    <div class="hero-card">
+      <div><div class="album-label">Álbum activo</div><div class="album-title" id="activeAlbumTitle">Liga · Demo MVP</div></div>
+      <div class="progress-ring" id="progressRing"><span id="completionPct">0%</span></div>
+    </div>
+    <div class="stats"><div><b id="ownedCount">0</b><span>únicos</span></div><div><b id="missingCount">0</b><span>faltan</span></div><div><b id="repeatCount">0</b><span>repes</span></div></div>
+  </header>
+  <main>
+    <section class="view active" id="homeView">
+      <div class="welcome-card"><div><span class="pill">MVP</span><h2>Intercambia sin comparar listas a mano</h2><p>Tu QR lleva una copia compacta de tu colección. La otra persona lo escanea y CromoMatch calcula automáticamente qué os podéis cambiar.</p></div><button class="primary big" data-go="swapView">🤝 Empezar un intercambio</button></div>
+      <div class="grid-2"><button class="action-card" data-go="albumView"><span class="action-icon">📚</span><b>Mi álbum</b><small>Marca cromos y repes</small></button><button class="action-card" id="quickQrBtn"><span class="action-icon">▦</span><b>Mi QR</b><small>Que lo escaneen</small></button></div>
+      <div class="section-title"><h3>Cómo funciona</h3></div>
+      <div class="steps"><div class="step"><span>1</span><div><b>Tú muestras tu QR</b><small>No incluye teléfono ni email.</small></div></div><div class="step"><span>2</span><div><b>La otra persona lo escanea</b><small>Puede usar CromoMatch o la cámara normal.</small></div></div><div class="step"><span>3</span><div><b>Match instantáneo</b><small>Veis qué recibes y qué puedes dar.</small></div></div></div>
+      <div class="info-card"><b>🧪 Álbum de demostración</b><p>Esta primera versión usa un catálogo ficticio para probar la experiencia. Cuando tengamos la checklist oficial de Liga Este, sustituimos el catálogo sin cambiar el motor.</p></div>
+    </section>
+    <section class="view" id="albumView">
+      <div class="topbar"><div><div class="eyebrow dark">Colección</div><h2>Mi álbum</h2></div><button class="secondary compact" id="resetDemoBtn">Reiniciar demo</button></div>
+      <div class="filters"><input id="searchSticker" placeholder="Buscar equipo o cromo…"><select id="clubFilter"></select><select id="statusFilter"><option value="all">Todos</option><option value="missing">Me faltan</option><option value="owned">Los tengo</option><option value="repeat">Repes</option></select></div>
+      <div class="legend"><span><i class="dot missing"></i> Falta</span><span><i class="dot owned"></i> Tengo</span><span><i class="dot repeat"></i> Repe</span></div><div id="stickerGroups"></div>
+    </section>
+    <section class="view" id="swapView">
+      <div class="topbar"><div><div class="eyebrow dark">Intercambio</div><h2>Match por QR</h2></div></div>
+      <div class="swap-tabs"><button class="swap-tab active" data-swap="show">Mostrar mi QR</button><button class="swap-tab" data-swap="scan">Escanear</button></div>
+      <div id="showQrPanel" class="swap-panel active"><div class="qr-card"><div class="qr-header"><div><div class="album-label">Mi colección</div><h3 id="qrOwnerTitle">Coleccionista</h3></div><button class="secondary compact" id="editNameBtn">✏️ Nombre</button></div><div class="qr-box" id="qrBox"></div><p class="qr-help">La otra persona puede escanear este QR con la cámara del móvil. Se abrirá CromoMatch y comparará su colección con la tuya.</p><div class="row"><button class="primary" id="shareQrLinkBtn">📤 Compartir enlace</button><button class="secondary" id="copyQrLinkBtn">Copiar enlace</button></div><div class="privacy-note">🔒 El QR contiene solo el estado de este álbum, comprimido. No incluye teléfono, email ni ubicación.</div></div></div>
+      <div id="scanQrPanel" class="swap-panel"><div class="scanner-card"><div id="reader"></div><button class="primary big" id="startScannerBtn">📷 Abrir escáner</button><p>También puedes escanear el QR con la cámara normal del teléfono: el enlace abrirá CromoMatch automáticamente.</p><div class="divider"><span>o</span></div><label class="field-label">Pega el enlace o código</label><textarea id="swapPaste" placeholder="Pega aquí el enlace recibido…"></textarea><button class="secondary full" id="processPasteBtn">Comparar</button></div></div>
+      <div id="matchResult" class="match-result" hidden><div class="match-hero"><div class="match-burst">✨</div><div><div class="eyebrow dark">Match encontrado</div><h2 id="matchTitle">Podéis intercambiar</h2><p id="matchSubtitle"></p></div></div><div class="match-columns"><div class="match-card receive"><h3>✅ Te puede dar</h3><div id="receiveList" class="match-chips"></div></div><div class="match-card give"><h3>🎁 Tú puedes dar</h3><div id="giveList" class="match-chips"></div></div></div><button class="primary big full" id="bestTradeBtn">⚡ Preparar mejor cambio 1×1</button><div id="proposalBox" class="proposal" hidden></div></div>
+    </section>
+    <section class="view" id="moreView">
+      <div class="topbar"><div><div class="eyebrow dark">Configuración</div><h2>Más</h2></div></div>
+      <div class="settings-card"><label class="field-label">Nombre que aparece al intercambiar</label><div class="row"><input id="ownerNameInput" placeholder="Ej. Luis"><button class="primary" id="saveOwnerNameBtn">Guardar</button></div></div>
+      <div class="settings-card"><h3>💾 Copia de seguridad</h3><p>Guarda tu colección en un archivo para pasarla a otro móvil.</p><div class="row wrap"><button class="secondary" id="exportBtn">Exportar</button><button class="secondary" id="importBtn">Importar</button><input type="file" id="importFile" accept=".json,application/json" hidden></div></div>
+      <div class="settings-card"><h3>🚀 Camino a App Store / Play Store</h3><p>La base está preparada como PWA. La siguiente capa será sincronización en nube, usuarios opcionales y empaquetado con Capacitor para iOS y Android.</p><ul><li>QR presencial y por WhatsApp</li><li>Motor multiálbum</li><li>Sin cuenta obligatoria para escanear</li><li>Catálogo oficial importable</li></ul></div>
+    </section>
+  </main>
+  <nav class="bottom-nav"><button class="nav-item active" data-go="homeView"><span>⌂</span><small>Inicio</small></button><button class="nav-item" data-go="albumView"><span>▦</span><small>Álbum</small></button><button class="nav-item swap-main" data-go="swapView"><span>⇄</span><small>Cambiar</small></button><button class="nav-item" data-go="moreView"><span>•••</span><small>Más</small></button></nav>
+</div>
+<div id="toast" class="toast"></div>
+<div id="modal" class="modal" hidden><div class="modal-card"><div class="modal-handle"></div><h3 id="modalTitle">Título</h3><div id="modalBody"></div><div class="row modal-actions"><button class="secondary" id="modalCancel">Cancelar</button><button class="primary" id="modalOk">Guardar</button></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script><script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script><script src="app.js"></script>
+</body>
+</html>
