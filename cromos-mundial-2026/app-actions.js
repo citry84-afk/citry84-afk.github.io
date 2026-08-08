@@ -1,0 +1,25 @@
+function listText(type){
+ const isM=type==='missing', src=isM?data.missing:data.repeats; let lines=[`Álbum Mundial 2026 · ${isM?'CROMOS QUE FALTAN':'CROMOS REPES'}`,''];
+ groupOrder().forEach(g=>{let gl=[];Object.keys(teams).filter(t=>teams[t].group===g).forEach(t=>{if(isM){const a=src[t]||[];if(a.length)gl.push(`${teams[t].name} (${t}): ${a.join(', ')}`)}else{const o=src[t]||{};const vals=Object.entries(o).sort((a,b)=>+a[0]-+b[0]).map(([n,q])=>q>1?`${n}(x${q})`:n);if(vals.length)gl.push(`${teams[t].name} (${t}): ${vals.join(', ')}`)}});if(gl.length){lines.push(g, ...gl,'')}});if(isM){const un=Object.entries(data.uncertain||{}).flatMap(([t,a])=>a.map(n=>codeOf(t,n)));if(un.length)lines.push(`Dudosos: ${un.join(', ')}`)}return lines.join('\n').trim();
+}
+async function share(type){const text=listText(type);if(navigator.share){try{await navigator.share({title:'Álbum Mundial 2026',text});return}catch(e){}}await navigator.clipboard.writeText(text);toast('Lista copiada al portapapeles')}
+function add(which){const p=normalizeCode(document.querySelector('#addCode').value);if(!p||!teams[p.team])return toast('Código no válido');if(which==='missing'){data.missing[p.team]??=[];if(!data.missing[p.team].includes(p.num))data.missing[p.team].push(p.num);data.missing[p.team].sort((a,b)=>a-b)}else{data.repeats[p.team]??={};data.repeats[p.team][p.num]=(+(data.repeats[p.team][p.num]||0))+1}document.querySelector('#addCode').value='';save();toast('Añadido')}
+function exportData(){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='album-mundial-2026-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+let photoFile=null;
+function pickPhoto(){document.querySelector('#photoInput').click()}
+function onPhotoPicked(e){const f=e.target.files&&e.target.files[0];if(!f)return;photoFile=f;const img=document.querySelector('#photoImg');img.src=URL.createObjectURL(f);document.querySelector('#photoPreview').classList.add('show')}
+async function sharePhoto(){if(!photoFile)return toast('Haz una foto primero');const text='Álbum Mundial 2026: analiza esta foto de cromos y compárala con mi lista de faltantes y repetidos de este chat.';if(navigator.canShare&&navigator.share&&navigator.canShare({files:[photoFile]})){try{await navigator.share({title:'Cromos Mundial 2026',text,files:[photoFile]});return}catch(e){if(e&&e.name==='AbortError')return}}toast('Usa Compartir del navegador y envía la foto a ChatGPT')}
+function clearPhoto(){photoFile=null;document.querySelector('#photoInput').value='';document.querySelector('#photoPreview').classList.remove('show');document.querySelector('#photoImg').src=''}
+function importDataFile(e){const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const parsed=JSON.parse(r.result);if(!parsed.missing||!parsed.repeats)throw new Error('Formato no válido');data=parsed;save();toast('Copia importada ✅')}catch(err){toast('No se pudo importar el archivo')}};r.readAsText(f)}
+function toast(msg){const t=document.querySelector('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+function renderAll(){counts();renderMissing();renderRepeats()}
+
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelector('#'+b.dataset.tab).classList.add('active')});
+document.querySelector('#checkBtn').onclick=checkQuick;document.querySelector('#quickCode').addEventListener('keydown',e=>{if(e.key==='Enter')checkQuick()});
+document.querySelector('#missingSearch').oninput=renderMissing;document.querySelector('#repeatSearch').oninput=renderRepeats;document.querySelector('#compareBtn').onclick=compare;
+document.querySelector('#showUncertain').onclick=()=>{document.querySelector('#missingSearch').value='BRA';renderMissing();toast('Los 2 dudosos son BRA 6 y BRA 11')};
+document.querySelector('#shareMissing').onclick=()=>share('missing');document.querySelector('#shareRepeats').onclick=()=>share('repeats');document.querySelector('#copyMissingBtn').onclick=()=>share('missing');document.querySelector('#copyRepeatsBtn').onclick=()=>share('repeats');
+document.querySelector('#addMissingBtn').onclick=()=>add('missing');document.querySelector('#addRepeatBtn').onclick=()=>add('repeat');document.querySelector('#exportBtn').onclick=exportData;document.querySelector('#importBtn').onclick=()=>document.querySelector('#importInput').click();document.querySelector('#importInput').onchange=importDataFile;
+document.querySelector('#photoBtn').onclick=pickPhoto;document.querySelector('#photoInput').onchange=onPhotoPicked;document.querySelector('#sharePhotoBtn').onclick=sharePhoto;document.querySelector('#clearPhotoBtn').onclick=clearPhoto;
+document.querySelector('#resetBtn').onclick=()=>{if(confirm('¿Restaurar el listado inicial? Se perderán los cambios hechos en este dispositivo.')){data=clone(initial);save();toast('Listado restaurado')}};
+renderAll();
