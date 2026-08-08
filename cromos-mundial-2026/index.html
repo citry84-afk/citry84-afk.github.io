@@ -37,25 +37,35 @@
   </nav>
 
   <section id="missing" class="panel active">
-    <div class="toolbar"><input id="missingSearch" placeholder="Buscar selección o código…"><button class="btn secondary" id="showUncertain">Ver dudosos</button></div>
+    <div class="toolbar">
+      <input id="missingSearch" placeholder="Buscar selección o código…">
+      <select id="missingGroup"><option value="">Todos los grupos</option></select>
+      <button class="btn secondary" id="showUncertain">Ver dudosos</button>
+    </div>
     <div id="missingGroups" class="groups"></div>
   </section>
 
   <section id="repeats" class="panel">
-    <div class="toolbar"><input id="repeatSearch" placeholder="Buscar selección o código…"></div>
+    <div class="toolbar">
+      <input id="repeatSearch" placeholder="Buscar selección o código…">
+      <select id="repeatGroup"><option value="">Todos los grupos</option></select>
+    </div>
     <div id="repeatGroups" class="groups"></div>
   </section>
 
   <section id="exchange" class="panel">
     <div class="exchange-card">
       <h2>🤝 Comparar con otra persona</h2>
-      <div class="note">Pega códigos separados por comas, espacios o saltos de línea. Ejemplo: <b>GER 1, ESP 9, FWC15</b>.</div>
-      <label>La otra persona TIENE</label>
-      <textarea id="otherHas" placeholder="GER 1, ARG 10, ESP 18…"></textarea>
-      <label>La otra persona BUSCA</label>
-      <textarea id="otherNeeds" placeholder="FRA 3, CAN 14, TUR 5…"></textarea>
-      <button class="btn" id="compareBtn" style="margin-top:10px;width:100%">Calcular intercambio</button>
-      <div class="matches">
+      <div id="tradeInputs">
+        <div class="note">Pega códigos separados por comas, espacios o saltos de línea. Ejemplo: <b>GER 1, ESP 9, FWC15</b>.</div>
+        <label>La otra persona TIENE</label>
+        <textarea id="otherHas" placeholder="GER 1, ARG 10, ESP 18…"></textarea>
+        <label>La otra persona BUSCA</label>
+        <textarea id="otherNeeds" placeholder="FRA 3, CAN 14, TUR 5…"></textarea>
+        <button class="btn" id="compareBtn" style="margin-top:10px;width:100%">Calcular intercambio</button>
+      </div>
+      <button class="btn secondary trade-focus" id="focusTradeBtn">⚡ Ver solo intercambio útil</button>
+      <div class="matches" id="tradeMatches">
         <div class="matchbox"><h3 class="ok">✅ Me puede dar</h3><div id="theyGive" class="matchlist"><span class="muted">—</span></div></div>
         <div class="matchbox"><h3 class="bad">🎁 Yo le puedo dar</h3><div id="iGive" class="matchlist"><span class="muted">—</span></div></div>
       </div>
