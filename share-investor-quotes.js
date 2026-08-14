@@ -92,22 +92,53 @@
       return canvas;
     };
 
-    btn.addEventListener('click',async()=>{
-      const original=btn.textContent;btn.textContent='Preparando ficha…';btn.disabled=true;
+    const dataUrlToFile=(dataUrl,name)=>{
+      const parts=dataUrl.split(',');
+      const mime=(parts[0].match(/data:([^;]+)/)||[])[1]||'image/png';
+      const bin=atob(parts[1]);
+      const bytes=new Uint8Array(bin.length);
+      for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+      return new File([bytes],name,{type:mime});
+    };
+
+    const fallbackDownload=(file)=>{
+      const url=URL.createObjectURL(file);
+      const a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2500);
+    };
+
+    btn.addEventListener('click',()=>{
+      const original=btn.textContent;
       const quote=nextQuote();
+      btn.textContent='Preparando ficha…';
       try{
+        // Importante para iOS/Safari: todo se genera de forma síncrona para conservar
+        // la activación del usuario hasta navigator.share().
         const canvas=drawCard(quote);
-        const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png',1));
-        if(!blob) throw new Error('No se pudo crear la imagen');
-        const file=new File([blob],`seguimiento-semanal-${m.updated.replaceAll('/','-')}.png`,{type:'image/png'});
-        if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-          await navigator.share({title:'Mi semana en mercados',text:`${quote.text} — ${quote.author}`,files:[file]});
+        const fileName=`seguimiento-semanal-${m.updated.replaceAll('/','-')}.png`;
+        const file=dataUrlToFile(canvas.toDataURL('image/png',1),fileName);
+
+        if(navigator.share){
+          const payload={title:'Mi semana en mercados',text:`${quote.text} — ${quote.author}`};
+          if(!navigator.canShare||navigator.canShare({files:[file]})) payload.files=[file];
+          const sharePromise=navigator.share(payload);
+          btn.textContent='Compartiendo…';
+          Promise.resolve(sharePromise).catch(error=>{
+            if(error&&error.name!=='AbortError'){
+              console.error(error);
+              fallbackDownload(file);
+              btn.textContent='Ficha guardada';
+            }
+          }).finally(()=>setTimeout(()=>{btn.textContent=original;btn.disabled=false;},1000));
         }else{
-          const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);btn.textContent='Ficha descargada';setTimeout(()=>btn.textContent=original,1800);
+          fallbackDownload(file);
+          btn.textContent='Ficha guardada';
+          setTimeout(()=>{btn.textContent=original;btn.disabled=false;},1600);
         }
       }catch(error){
-        if(error&&error.name!=='AbortError'){console.error(error);btn.textContent='No se pudo compartir';setTimeout(()=>btn.textContent=original,2000);}
-      }finally{btn.disabled=false;if(btn.textContent==='Preparando ficha…')btn.textContent=original;}
+        console.error(error);
+        btn.textContent='No se pudo compartir';
+        setTimeout(()=>{btn.textContent=original;btn.disabled=false;},1800);
+      }
     });
   };
 
