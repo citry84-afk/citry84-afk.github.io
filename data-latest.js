@@ -3,63 +3,63 @@
   if(!D) return;
 
   Object.assign(D.meta,{
-    updated:'21/08/2026',
-    week:34,
-    status:'Fondos disponibles 12,7% · ORCL sigue concentrando el riesgo',
+    updated:'28/08/2026',
+    week:35,
+    status:'Fondos disponibles 22,3% · ORCL sigue concentrando el riesgo',
     statusLevel:'amber'
   });
 
   Object.assign(D.current,{
-    liquiditySnapshotDate:'21/08/2026 (PDF cierre 20/08)',
-    liquidityPortfolio:62607.81,
-    portfolio:62607.81,
-    pdfNav:61334.81,
-    pdfDate:'20/08/2026',
+    liquiditySnapshotDate:'28/08/2026 (PDF cierre 26/08)',
+    liquidityPortfolio:73174.45,
+    portfolio:73174.45,
+    pdfNav:69001.51,
+    pdfDate:'26/08/2026',
     contributed:54475.00,
-    yearProfit:8132.81,
-    ytdManualPct:14.9294,
-    ibkrTwrPct:5.10,
-    optionsGrossYtd:20056.22,
-    assignmentRealizedTotal:-11966.63,
-    assignmentDividendsGross:1019.85,
-    closedAssignmentAdjustments:-10946.78,
-    optionsYtd:9109.44,
-    optionsPrudent:-4097.61,
-    optionsWeekly:177.85,
-    optionsAvgWeekly:267.92,
-    optionsMonthlyAvg:1160.99,
-    optionsAnnualProjection:13931.84,
-    fundsAvailable:7958.61,
-    excessLiquidity:12690.95,
-    excessAfterExpiry:13930.66,
-    cash:-107914.38,
-    buyingPower:53057.42,
-    grossSecurities:212335.19,
-    mtdInterest:-309.35,
-    unrealizedPnl:-5099,
+    yearProfit:18699.45,
+    ytdManualPct:34.3267,
+    ibkrTwrPct:18.24,
+    optionsGrossYtd:20839.62,
+    assignmentRealizedTotal:-11878.91,
+    assignmentDividendsGross:1021.35,
+    closedAssignmentAdjustments:-10857.56,
+    optionsYtd:9982.06,
+    optionsPrudent:3144.42,
+    optionsWeekly:872.62,
+    optionsAvgWeekly:285.20,
+    optionsMonthlyAvg:1235.87,
+    optionsAnnualProjection:14830.49,
+    fundsAvailable:16286.55,
+    excessLiquidity:22015.09,
+    excessAfterExpiry:21678.86,
+    cash:-107299.40,
+    buyingPower:108577.00,
+    grossSecurities:220379.30,
+    mtdInterest:-409.83,
+    unrealizedPnl:4527,
     realizedPnl:0,
     orclShares:1096,
-    orclPrice:142.07,
-    orclMarketValueEur:133330.26,
-    orclUnrealized:-13225.24,
+    orclPrice:148.87,
+    orclMarketValueEur:140018.69,
+    orclUnrealized:-6858.58,
     orclRealized:-3637.46,
-    orclMtmTotal:-16862.70,
+    orclMtmTotal:-10496.04,
     nvoShares:3,
-    nvoPrice:46.14,
-    nvoMarketValueEur:118.53,
-    nvoUnrealized:18.19,
+    nvoPrice:47.19,
+    nvoMarketValueEur:121.49,
+    nvoUnrealized:20.94,
     nvoRealized:-2686.36,
-    nvoPnlApprox:-2668.17,
-    assignmentMarketValueEur:133448.79,
-    assignmentUnrealized:-13207.05
+    nvoPnlApprox:-2665.42,
+    assignmentMarketValueEur:140140.18,
+    assignmentUnrealized:-6837.64
   });
 
   const august=D.monthlyOptions.find(x=>x.month==='Agosto');
-  if(august) august.value=955.36;
-  else D.monthlyOptions.push({month:'Agosto',value:955.36});
+  if(august) august.value=1827.98;
+  else D.monthlyOptions.push({month:'Agosto',value:1827.98});
 
   const y2026=D.annualOptions.find(x=>String(x.year).startsWith('2026'));
-  if(y2026) y2026.value=9109.44;
+  if(y2026) y2026.value=9982.06;
 
   const week32={week:32,date:'2026-08-07',ytdPct:16.1315,saldo:63262.61,aportado:54475,euroYear:8787.61,optionsYtd:8461.19,weeklyOptions:307.11,source:'Pantallazo 07/08 + PDF 06/08'};
   const idx32=D.weekly2026.findIndex(x=>x.week===32);
@@ -76,8 +76,14 @@
   if(idx34>=0) D.weekly2026[idx34]=week34;
   else D.weekly2026.push(week34);
 
+  const week35={week:35,date:'2026-08-28',ytdPct:34.3267,saldo:73174.45,aportado:54475,euroYear:18699.45,optionsYtd:9982.06,weeklyOptions:872.62,source:'Pantallazo 28/08 + PDF 26/08'};
+  const idx35=D.weekly2026.findIndex(x=>x.week===35);
+  if(idx35>=0) D.weekly2026[idx35]=week35;
+  else D.weekly2026.push(week35);
+
   if(!D.weeklyOptionsAll['2026']) D.weeklyOptionsAll['2026']=[];
   D.weeklyOptionsAll['2026'][31]=307.11;
   D.weeklyOptionsAll['2026'][32]=470.40;
   D.weeklyOptionsAll['2026'][33]=177.85;
+  D.weeklyOptionsAll['2026'][34]=872.62;
 })();
