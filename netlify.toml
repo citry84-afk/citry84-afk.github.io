@@ -3,6 +3,12 @@
   functions = "netlify/functions"
 
 [[redirects]]
+  from = "/"
+  to = "/app/"
+  status = 302
+  force = true
+
+[[redirects]]
   from = "/api/ibkr-flex-sync"
   to = "/.netlify/functions/ibkr-flex-sync"
   status = 200
