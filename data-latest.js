@@ -5,7 +5,7 @@
   Object.assign(D.meta,{
     updated:'04/09/2026',
     week:36,
-    status:'Fondos disponibles 25,4% · ORCL sigue concentrando el riesgo',
+    status:'Fondos disponibles 25,4% · liquidez en zona ideal; ORCL sigue concentrando el riesgo',
     statusLevel:'amber'
   });
 
@@ -89,6 +89,8 @@
   if(idx36>=0) D.weekly2026[idx36]=week36;
   else D.weekly2026.push(week36);
 
+  D.weekly2026.sort((a,b)=>a.week-b.week);
+
   if(!D.weeklyOptionsAll['2026']) D.weeklyOptionsAll['2026']=[];
   D.weeklyOptionsAll['2026'][31]=307.11;
   D.weeklyOptionsAll['2026'][32]=470.40;
@@ -96,6 +98,17 @@
   D.weeklyOptionsAll['2026'][34]=872.62;
   D.weeklyOptionsAll['2026'][35]=753.44;
 
-  const footer=document.querySelector('.footer-note');
-  if(footer) footer.textContent='PDF IBKR YTD cerrado al 03/09/2026; valor de cartera y fondos disponibles del pantallazo tomado el 04/09/2026. La rentabilidad principal se calcula frente al capital neto aportado de 54.975 €. La semana 29 conserva el NAV del PDF porque no se dispone del pantallazo.';
+  setTimeout(()=>{
+    const footer=document.querySelector('.footer-note');
+    if(footer) footer.textContent='PDF IBKR YTD cerrado al 03/09/2026; valor de cartera y fondos disponibles del pantallazo tomado el 04/09/2026. La rentabilidad principal se calcula frente al capital neto aportado de 54.975 €. La semana 29 conserva el NAV del PDF porque no se dispone del pantallazo.';
+
+    const quality=document.getElementById('optionsQuality');
+    if(quality){
+      quality.querySelectorAll('span').forEach(el=>{
+        if(el.textContent.includes('VTGN, RPD, RGTI, ORCL y NVO')){
+          el.textContent='Ventas realizadas de VTGN, RPD, RGTI, ORCL, NVO y TENX';
+        }
+      });
+    }
+  },0);
 })();
