@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#10291f" />
+  <meta name="theme-color" content="#061a22" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="description" content="Guía familiar para un viaje de 12 noches por Colombia: Medellín, Eje Cafetero, Cartagena y Barú." />
@@ -14,30 +14,37 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div id="installTip" class="install-tip">💡 Guarda esta guía en tu pantalla de inicio: Compartir → “Añadir a pantalla de inicio”. <button id="closeTip" aria-label="Cerrar">×</button></div>
+  <div id="installTip" class="install-tip">✨ Esta guía funciona como una app: Compartir → “Añadir a pantalla de inicio”. <button id="closeTip" aria-label="Cerrar">×</button></div>
 
   <header class="hero">
-    <div class="hero-top">
-      <div class="eyebrow">🇨🇴 VIAJE FAMILIAR · V0.2 · 14 SEP 2026</div>
-      <button id="shareGuide" class="share-btn" type="button">↗ Compartir</button>
-    </div>
-    <h1>COLOMBIA 2027</h1>
-    <p>12 noches · 4 viajeros · Fechas por decidir</p>
-    <div class="route-strip" aria-label="Ruta resumida">
-      <span>✈️<b>MAD</b></span><i>→</i>
-      <span>🌺<b>Medellín</b><small>3n</small></span><i>→</i>
-      <span>🌴<b>Eje Cafetero</b><small>3n</small></span><i>→</i>
-      <span>🌈<b>Cartagena</b><small>2n</small></span><i>→</i>
-      <span>🏝️<b>Barú</b><small>4n</small></span>
+    <div class="hero-glow one"></div><div class="hero-glow two"></div>
+    <div class="hero-inner">
+      <div class="hero-top">
+        <div class="eyebrow">🇨🇴 VIAJE FAMILIAR · V0.3 · WOW EDITION</div>
+        <button id="shareGuide" class="share-btn" type="button">↗ Compartir</button>
+      </div>
+      <div class="hero-copy">
+        <span class="hero-badge">12 noches · 4 viajeros · Caribe al final</span>
+        <h1>COLOMBIA<br><em>2027</em></h1>
+        <p>Montañas, café, colores y Caribe. Un viaje pensado para disfrutarlo los cuatro, no para ir tachando sitios.</p>
+      </div>
+      <div class="route-strip" aria-label="Ruta resumida">
+        <span>✈️<b>MAD</b><small>salida</small></span><i>→</i>
+        <span>🌺<b>Medellín</b><small>3 noches</small></span><i>→</i>
+        <span>🌴<b>Eje Cafetero</b><small>3 noches</small></span><i>→</i>
+        <span>🌈<b>Cartagena</b><small>2 noches</small></span><i>→</i>
+        <span>🏝️<b>Barú</b><small>4 noches</small></span>
+      </div>
     </div>
   </header>
 
   <nav class="tabs" id="tabs">
-    <button data-tab="hoy" class="active">📅<span>Resumen</span></button>
-    <button data-tab="vuelos">✈️<span>Vuelos</span></button>
+    <button data-tab="hoy" class="active">✨<span>Resumen</span></button>
+    <button data-tab="ruta">🗓️<span>Itinerario</span></button>
+    <button data-tab="kids">🎒<span>Niños</span></button>
     <button data-tab="hoteles">🏨<span>Hoteles</span></button>
-    <button data-tab="ruta">🗓️<span>Ruta</span></button>
-    <button data-tab="playa">🏝️<span>Playa</span></button>
+    <button data-tab="playa">🏝️<span>Caribe</span></button>
+    <button data-tab="vuelos">✈️<span>Vuelos</span></button>
     <button data-tab="reservas">✅<span>Reservas</span></button>
     <button data-tab="presupuesto">💰<span>Presupuesto</span></button>
     <button data-tab="consejos">💡<span>Consejos</span></button>
@@ -45,65 +52,85 @@
 
   <main>
     <section id="hoy" class="panel active">
-      <div class="section-head"><div><p class="kicker">VISTA GENERAL</p><h2>El viaje que estamos construyendo</h2></div><span class="pill amber">Ruta casi cerrada</span></div>
-      <div class="summary-grid">
-        <article class="stat"><strong>12</strong><span>noches</span></article>
-        <article class="stat"><strong>4</strong><span>bases</span></article>
-        <article class="stat"><strong>4</strong><span>noches de Caribe</span></article>
-        <article class="stat"><strong>7–9 k€</strong><span>rango inicial</span></article>
+      <div class="section-head"><div><p class="kicker">VISTA GENERAL</p><h2>Un viaje que cambia de escenario cada 3 días</h2></div><span class="pill lime">Ruta muy sólida</span></div>
+
+      <div class="photo-grid">
+        <a class="photo-card tall" href="https://unsplash.com/photos/a-scenic-view-of-a-valley-and-mountains-x_3-flSAKS0" target="_blank" rel="noopener" style="--photo:url('https://images.unsplash.com/photo-1640768239887-77479f49a7dc?auto=format&fit=crop&q=80&w=1600')"><span>01</span><div><b>Medellín</b><small>Ciudad entre montañas</small></div></a>
+        <a class="photo-card" href="https://unsplash.com/photos/green-palm-tree-between-grass-field-under-cloudy-sky-at-daytime-wVnBd8wm1Cc" target="_blank" rel="noopener" style="--photo:url('https://images.unsplash.com/photo-1532185922611-3410b1898a1c?auto=format&fit=crop&q=80&w=1600')"><span>02</span><div><b>Cocora</b><small>Palmas gigantes</small></div></a>
+        <a class="photo-card" href="https://unsplash.com/es/fotos/una-torre-del-reloj-iluminada-por-la-noche-en-una-ciudad-GHXJC4i7ISc" target="_blank" rel="noopener" style="--photo:url('https://images.unsplash.com/photo-1633627397446-04c7fca71c74?auto=format&fit=crop&q=80&w=1600')"><span>03</span><div><b>Cartagena</b><small>Color y murallas</small></div></a>
+        <a class="photo-card wide" href="https://unsplash.com/photos/people-enjoying-a-sunny-day-at-the-beach-9TSQohupRaQ" target="_blank" rel="noopener" style="--photo:url('https://images.unsplash.com/photo-1769134277006-9cdd9d048fd9?auto=format&fit=crop&q=80&w=1600')"><span>04</span><div><b>Caribe</b><small>4 noches sin reloj</small></div></a>
       </div>
-      <article class="feature-card jungle">
-        <div><span class="tag">IDEA CENTRAL</span><h3>De Colombia activa… a Caribe sin reloj</h3><p>Medellín y Guatapé → naturaleza y café → Cartagena colonial → cuatro noches para bajar revoluciones en Barú.</p></div>
+
+      <div class="summary-grid">
+        <article class="stat"><small>Ritmo</small><strong>4</strong><span>bases</span></article>
+        <article class="stat"><small>Caribe</small><strong>4</strong><span>noches</span></article>
+        <article class="stat"><small>Niños</small><strong>12</strong><span>misiones</span></article>
+        <article class="stat"><small>Objetivo</small><strong>7–9k</strong><span>€ aprox.</span></article>
+      </div>
+
+      <article class="feature-card wow">
+        <div class="feature-icon">✦</div>
+        <div><span class="tag">LA IDEA DEL VIAJE</span><h3>Cada día tiene un momento “wow” y un momento pensado para los niños</h3><p>No queremos seis horas de turismo seguido. Alternaremos ciencia, barco, teleférico, Jeep, animales, piscina, playa y tiempo libre.</p></div>
       </article>
+
       <div class="decision-grid">
         <article class="decision done"><b>✓ Ruta</b><span>3 Medellín · 3 Eje · 2 Cartagena · 4 Barú</span></article>
-        <article class="decision"><b>1. Fechas</b><span>La decisión que desbloquea precios reales</span></article>
-        <article class="decision"><b>2. Resort</b><span>Sofitel vs Decameron vs Isla del Encanto</span></article>
-        <article class="decision"><b>3. Hoteles</b><span>Cerrar las tres primeras bases</span></article>
+        <article class="decision"><b>1. Fechas</b><span>Desbloquean precios reales</span></article>
+        <article class="decision"><b>2. Resort</b><span>Sofitel / Decameron / Isla del Encanto</span></article>
+        <article class="decision"><b>3. Hoteles</b><span>Cerrar las primeras tres bases</span></article>
       </div>
-      <div class="notice"><b>🎯 Mi foco ahora</b><p>La ruta ya está lo bastante madura para empezar a reservar. Lo siguiente es elegir mes aproximado y, en cuanto exista una ventana de fechas, sustituir cada precio estimado por tarifas reales.</p></div>
+    </section>
+
+    <section id="ruta" class="panel">
+      <div class="section-head"><div><p class="kicker">12 DÍAS · CON HORAS ORIENTATIVAS</p><h2>Itinerario detallado</h2></div><span class="pill lime">Familiar</span></div>
+      <p class="intro">Toca cualquier día para desplegar horarios, momento para niños, plan B y enlaces oficiales. Las horas se ajustarán cuando tengamos vuelos y hoteles.</p>
+      <div id="days" class="timeline"></div>
+    </section>
+
+    <section id="kids" class="panel">
+      <div class="section-head"><div><p class="kicker">PASAPORTE DE AVENTURAS</p><h2>El viaje también es suyo</h2></div><span id="kidsProgress" class="pill aqua">0/12</span></div>
+      <article class="kids-hero">
+        <div class="kids-orbit">🎒</div>
+        <div><span class="tag">PAULA + ÁNGEL</span><h3>12 misiones, una por día</h3><p>La idea es que ellos también abran la guía, marquen retos y tengan algo divertido que esperar cada jornada.</p></div>
+      </article>
+      <div id="kidsPassport" class="passport"></div>
+      <div class="notice dark"><b>💡 Regla que mantendría</b><p>Máximo una actividad “seria” por día. Si un plan se alarga, recortamos el siguiente. El viaje debe seguir sintiéndose como vacaciones.</p></div>
+    </section>
+
+    <section id="hoteles" class="panel">
+      <div class="section-head"><div><p class="kicker">ALOJAMIENTOS</p><h2>Shortlist real</h2></div><span class="pill lime">Candidatos</span></div>
+      <p class="intro">Aquí priorizamos habitación cómoda para cuatro, piscina y logística fácil. Cuando fijemos fechas, añadimos precio real y estado de reserva.</p>
+      <div id="hotelCandidates" class="hotel-groups"></div>
+    </section>
+
+    <section id="playa" class="panel">
+      <div class="section-head"><div><p class="kicker">FINAL DEL VIAJE</p><h2>4 noches de Caribe</h2></div><span class="pill aqua">Prioridad alta</span></div>
+      <article class="feature-card sea"><span class="tag">BARÚ</span><h3>El viaje termina bajando revoluciones</h3><p>Un día con aves y llegada al resort, uno 100% hotel, medio día de Rosario y un último día sin agenda.</p></article>
+
+      <div class="current-pick"><span>🏆 FAVORITO ACTUAL</span><h3>Sofitel Barú Calablanca</h3><p>Si el precio encaja, es el cierre más especial. Si queremos cero complicaciones y todo incluido con niños, Decameron puede ser más práctico.</p></div>
+      <div id="resortCompare" class="resort-grid"></div>
+
+      <div class="beach-days">
+        <article><b>Día 9</b><span>🦩 Aviario + llegada al resort</span></article>
+        <article><b>Día 10</b><span>🏖️ Resort + kids club / parque acuático</span></article>
+        <article><b>Día 11</b><span>🐠 Rosario + snorkel tranquilo</span></article>
+        <article><b>Día 12</b><span>😎 Playa, piscina y cero agenda</span></article>
+      </div>
     </section>
 
     <section id="vuelos" class="panel">
       <div class="section-head"><div><p class="kicker">LOGÍSTICA</p><h2>Vuelos</h2></div><span class="pill">Por definir</span></div>
       <div class="stack">
-        <article class="card"><span class="status proposed">PRIMERA OPCIÓN</span><h3>Madrid → Medellín</h3><p>Intentar entrada directa para no gastar la primera noche en Bogotá. Si no cuadra por precio o día de operación, valoramos conexión.</p><div class="meta">✈️ Internacional · 4 pasajeros</div></article>
-        <article class="card"><span class="status proposed">PROPUESTO</span><h3>Medellín → Pereira</h3><p>Vuelo corto para ganar tiempo y entrar directamente al Eje Cafetero.</p><div class="meta">✈️ Doméstico</div></article>
-        <article class="card"><span class="status proposed">PROPUESTO</span><h3>Pereira → Cartagena</h3><p>Salto directo al Caribe. Evitamos carretera y conexiones largas.</p><div class="meta">✈️ Doméstico</div></article>
-        <article class="card"><span class="status proposed">A COMPROBAR</span><h3>Cartagena → Madrid</h3><p>Prioridad al vuelo directo cuando coincida con nuestras fechas. Plan B: conexión en Bogotá o Medellín.</p><div class="meta">🏠 Regreso</div></article>
+        <article class="card route-card"><span class="status proposed">PRIMERA OPCIÓN</span><h3>MAD → Medellín</h3><p>Entrada directa para evitar perder una noche en Bogotá.</p><div class="meta">✈️ Internacional · 4 pasajeros</div></article>
+        <article class="card route-card"><span class="status proposed">PROPUESTO</span><h3>Medellín → Pereira</h3><p>Vuelo corto para entrar directamente al Eje Cafetero.</p><div class="meta">✈️ Doméstico</div></article>
+        <article class="card route-card"><span class="status proposed">PROPUESTO</span><h3>Pereira → Cartagena</h3><p>Salto directo al Caribe y ahorro de muchas horas de carretera.</p><div class="meta">✈️ Doméstico</div></article>
+        <article class="card route-card"><span class="status proposed">A COMPROBAR</span><h3>Cartagena → MAD</h3><p>Prioridad al directo si coincide. Plan B: conexión en Bogotá o Medellín.</p><div class="meta">🏠 Regreso</div></article>
       </div>
-    </section>
-
-    <section id="hoteles" class="panel">
-      <div class="section-head"><div><p class="kicker">ALOJAMIENTOS</p><h2>Shortlist real</h2></div><span class="pill green">Candidatos</span></div>
-      <p class="intro">Ya no son hoteles genéricos. Estos son los candidatos iniciales que merece la pena comparar cuando tengamos fechas.</p>
-      <div id="hotelCandidates" class="hotel-groups"></div>
-    </section>
-
-    <section id="ruta" class="panel">
-      <div class="section-head"><div><p class="kicker">12 NOCHES</p><h2>Itinerario día a día</h2></div><span class="pill green">Equilibrado</span></div>
-      <div id="days" class="timeline"></div>
-    </section>
-
-    <section id="playa" class="panel">
-      <div class="section-head"><div><p class="kicker">FINAL DEL VIAJE</p><h2>4 noches de Caribe</h2></div><span class="pill blue">Prioridad alta</span></div>
-      <article class="feature-card sea"><span class="tag">BARÚ</span><h3>La idea: terminar sin agenda</h3><p>Un día de llegada, un día 100% resort, una salida tranquila a Rosario y un último día completamente libre.</p></article>
-
-      <div class="current-pick"><span>🏆 FAVORITO ACTUAL</span><h3>Sofitel Barú Calablanca</h3><p>Si la diferencia de precio es razonable, es el final que más se parece a unas vacaciones de resort de nivel alto. Si queremos priorizar facilidad y todo incluido, Decameron pasa al nº1.</p></div>
-      <div id="resortCompare" class="resort-grid"></div>
-
-      <div class="beach-days">
-        <article><b>Día 9</b><span>🚤 Traslado + playa + piscina</span></article>
-        <article><b>Día 10</b><span>🏖️ Resort, sin planes</span></article>
-        <article><b>Día 11</b><span>🐠 Rosario / snorkel suave</span></article>
-        <article><b>Día 12</b><span>😎 Nada programado</span></article>
-      </div>
-      <div class="notice"><b>🏝️ Criterio de selección</b><p>No elegir solo por “la playa más bonita”. Con niños pesan mucho habitación para cuatro, piscina, restauración sencilla, sombra, logística y tener cosas que hacer sin tener que salir cada día.</p></div>
     </section>
 
     <section id="reservas" class="panel">
       <div class="section-head"><div><p class="kicker">CHECKLIST</p><h2>Pendiente de reservar</h2></div><span id="progressPill" class="pill amber">0% cerrado</span></div>
-      <p class="intro">Puedes tocar cada elemento cuando lo vayamos cerrando. Se guarda en este dispositivo.</p>
+      <p class="intro">Toca cada elemento cuando lo vayamos cerrando. Se guarda en este dispositivo.</p>
       <div class="checklist" id="checklist"></div>
     </section>
 
@@ -118,17 +145,17 @@
     <section id="consejos" class="panel">
       <div class="section-head"><div><p class="kicker">PRÁCTICO</p><h2>Cómo queremos viajar</h2></div></div>
       <div class="tips">
-        <article><b>👧 Ritmo familiar</b><p>Una actividad fuerte al día. Piscina o tiempo libre en las horas de más calor.</p></article>
-        <article><b>🚗 Traslados simples</b><p>Vuelos domésticos para los saltos largos y conductor privado cuando aporte tranquilidad.</p></article>
-        <article><b>🎒 Pocas bases</b><p>Solo cuatro alojamientos en 12 noches. Menos maletas y más sensación de viaje.</p></article>
-        <article><b>🏝️ Caribe al final</b><p>No usar Cartagena como sustituto de playa: las cuatro noches finales son vacaciones de verdad.</p></article>
-        <article><b>🧾 Reservas flexibles</b><p>Mientras falte tiempo, priorizar cancelación flexible aunque sea ligeramente más cara.</p></article>
-        <article><b>🩺 Seguro</b><p>Seguro médico amplio y traslados bien resueltos antes de salir de España.</p></article>
+        <article><b>🧒 Ritmo infantil</b><p>Una actividad fuerte al día. Nunca encadenar mañana y tarde de visitas si no hace falta.</p></article>
+        <article><b>☀️ Calor</b><p>Cartagena: visitas temprano, piscina y descanso en las horas más duras.</p></article>
+        <article><b>🚗 Traslados</b><p>Conductor privado en Guatapé y Barú cuando aporte tranquilidad; vuelos para saltos largos.</p></article>
+        <article><b>🎒 Pocas bases</b><p>Solo cuatro alojamientos en 12 noches. Menos maletas, más viaje.</p></article>
+        <article><b>🧾 Flexible</b><p>Mientras falte tiempo, reservar con cancelación flexible aunque cueste un poco más.</p></article>
+        <article><b>🏝️ Caribe al final</b><p>Cartagena es ciudad; la playa buena y el descanso llegan después.</p></article>
       </div>
     </section>
   </main>
 
-  <footer>Colombia 2027 · Guía familiar en construcción · Última actualización 14/09/2026</footer>
+  <footer>Colombia 2027 · Guía familiar · WOW Edition · Última actualización 14/09/2026</footer>
   <script src="app.js"></script>
 </body>
 </html>
