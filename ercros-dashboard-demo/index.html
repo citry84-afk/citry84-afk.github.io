@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel de Control de Fabricación</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#15314f;--muted:#6e7f95;--line:#dce5ef;--blue:#1769e0;--nav:#10345f;--g:#28a86b;--a:#f2a31b;--r:#e34d59;--shadow:0 10px 30px rgba(25,55,95,.08)}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}button{font:inherit}
+.shell{min-height:100vh;display:grid;grid-template-columns:250px 1fr}
+aside{background:linear-gradient(180deg,#123a6a,#0d2d54);color:white;padding:22px 16px;position:sticky;top:0;height:100vh}
+.brand{font-weight:800;font-size:23px;line-height:1.08;margin-bottom:4px}.brand small{display:block;font-size:12px;font-weight:500;color:#c8d7eb;margin-top:8px}
+.nav{margin-top:24px;display:grid;gap:7px}.nav button{border:0;background:transparent;color:#e8f0fb;padding:12px 13px;border-radius:12px;text-align:left;cursor:pointer;display:flex;gap:10px;align-items:center}.nav button:hover,.nav button.active{background:rgba(255,255,255,.12)}
+.note{position:absolute;bottom:20px;left:16px;right:16px;border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:12px;font-size:12px;color:#d5e1f1;background:rgba(255,255,255,.05)}
+main{padding:26px}.top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:20px}.top h1{margin:0;font-size:32px}.top p{margin:7px 0 0;color:var(--muted)}.updated{background:#e7f0ff;color:#22539a;padding:8px 11px;border-radius:999px;font-weight:700;font-size:13px;white-space:nowrap}
+.page{display:none}.page.active{display:block}.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:16px}.card{background:var(--card);border:1px solid #edf2f7;border-radius:18px;box-shadow:var(--shadow);padding:17px}.kpi .label{font-size:13px;font-weight:700;color:var(--muted)}.kpi .value{font-size:34px;font-weight:800;margin-top:6px}.kpi .hint{font-size:12px;font-weight:700;margin-top:7px}
+.g{color:var(--g)}.a{color:var(--a)}.r{color:var(--r)}.b{color:var(--blue)}
+.grid2{display:grid;grid-template-columns:1.55fr .95fr;gap:16px;margin-bottom:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+h2{font-size:20px;margin:0 0 12px}.subtle{color:var(--muted);font-size:12px}
+table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid var(--line);font-size:13px;text-align:left}th{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#667991}.dot{display:inline-block;width:12px;height:12px;border-radius:50%}.dg{background:var(--g)}.da{background:var(--a)}.dr{background:var(--r)}
+.badge{display:inline-block;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800}.badge.g{background:#e2f5ea;color:#197d4b}.badge.a{background:#fff0d5;color:#9c6200}.badge.r{background:#fde3e5;color:#b33440}
+.progress{height:13px;background:#e9eef6;border-radius:999px;overflow:hidden;margin:8px 0}.progress i{display:block;height:100%;background:linear-gradient(90deg,#1769e0,#69a5ff);border-radius:999px}
+.metric{border:1px solid var(--line);background:#fbfdff;border-radius:14px;padding:13px;margin-top:10px}.metric small{color:var(--muted);font-weight:700}.metric strong{display:block;font-size:24px;margin-top:4px}
+.alert{padding:12px;border-radius:13px;font-weight:700;font-size:13px;margin:9px 0}.alert.r{background:#fde8ea;color:#8e2630}.alert.a{background:#fff4df;color:#865700}.alert.g{background:#e8f7ef;color:#1e6a45}
+.list{display:grid;gap:9px}.item{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:10px 0}.item:last-child{border-bottom:0}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.tabs button{border:1px solid var(--line);background:white;border-radius:999px;padding:7px 10px;cursor:pointer}.tabs button.on{background:#173f73;color:white;border-color:#173f73}
+.footer{margin-top:18px;color:var(--muted);font-size:11px}
+@media(max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}.grid2,.grid3{grid-template-columns:1fr}}
+@media(max-width:780px){.shell{grid-template-columns:1fr}aside{height:auto;position:relative}.note{position:relative;left:auto;right:auto;bottom:auto;margin-top:16px}.nav{grid-template-columns:repeat(2,1fr)}main{padding:16px}.top{flex-direction:column}.cards{grid-template-columns:1fr}.top h1{font-size:26px}table{min-width:700px}.scroll{overflow:auto}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside>
+  <div class="brand">Panel de Control<br>de Fabricación<small>Prototipo navegable · datos ficticios</small></div>
+  <div class="nav">
+    <button class="active" data-page="general">📊 Visión general</button>
+    <button data-page="produccion">🏭 Producción</button>
+    <button data-page="stocks">📦 Stocks</button>
+    <button data-page="mantenimiento">🔧 Mantenimiento</button>
+    <button data-page="calidad">🧪 Calidad / laboratorio</button>
+    <button data-page="personal">👥 Personal</button>
+    <button data-page="incidencias">⚠️ Incidencias</button>
+  </div>
+  <div class="note"><strong>Objetivo:</strong> ver en segundos si el plan se cumple y poder bajar al detalle de la causa: stock, calidad, personal, mantenimiento o incidencias.</div>
+</aside>
+<main>
+  <div class="top"><div><h1 id="title">Visión general</h1><p id="subtitle">¿Vamos a cumplir el plan y los pedidos?</p></div><div class="updated">🕘 24/09/2026 · 09:47</div></div>
+
+  <section id="general" class="page active">
+    <div class="cards">
+      <div class="card kpi"><div class="label">Pedidos cubiertos</div><div class="value g">92%</div><div class="hint g">+3 pp vs ayer</div></div>
+      <div class="card kpi"><div class="label">Cumplimiento plan</div><div class="value a">89%</div><div class="hint a">-4 pp vs objetivo</div></div>
+      <div class="card kpi"><div class="label">Personal cubierto</div><div class="value b">96%</div><div class="hint a">1 ausencia crítica</div></div>
+      <div class="card kpi"><div class="label">Incidencias 24 h</div><div class="value r">3</div><div class="hint r">1 con impacto potencial</div></div>
+      <div class="card kpi"><div class="label">OT con impacto</div><div class="value a">2</div><div class="hint a">1 equipo no disponible</div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card scroll">
+        <h2>Estado por producto</h2>
+        <table><thead><tr><th>Producto</th><th>Stock</th><th>MP</th><th>Producción</th><th>Calidad</th><th>Personal</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr><td>Producto 1</td><td><span class="dot dg"></span></td><td><span class="dot dg"></span></td><td><span class="dot dg"></span></td><td><span class="dot dg"></span></td><td><span class="dot dg"></span></td><td><span class="badge g">En rango</span></td></tr>
+          <tr><td>Producto 2</td><td><span class="dot dg"></span></td><td><span class="dot da"></span></td><td><span class="dot da"></span></td><td><span class="dot dg"></span></td><td><span class="dot dg"></span></td><td><span class="badge a">Atención</span></td></tr>
+          <tr><td>Producto 3</td><td><span class="dot dr"></span></td><td><span class="dot dr"></span></td><td><span class="dot da"></span></td><td><span class="dot da"></span></td><td><span class="dot dg"></span></td><td><span class="badge r">Riesgo</span></td></tr>
+          <tr><td>Producto 4</td><td><span class="dot dg"></span></td><td><span class="dot dg"></span></td><td><span class="dot dg"></span></td><td><span class="dot dg"></span></td><td><span class="dot dg"></span></td><td><span class="badge g">En rango</span></td></tr>
+          <tr><td>Producto 5</td><td><span class="dot da"></span></td><td><span class="dot dg"></span></td><td><span class="dot dg"></span></td><td><span class="dot dr"></span></td><td><span class="dot dg"></span></td><td><span class="badge a">Atención</span></td></tr>
+          <tr><td>Producto 6</td><td><span class="dot dg"></span></td><td><span class="dot dg"></span></td><td><span class="dot dg"></span></td><td><span class="dot dg"></span></td><td><span class="dot da"></span></td><td><span class="badge g">En rango</span></td></tr>
+        </tbody></table>
+      </div>
+      <div class="card">
+        <h2>Producción vs plan</h2>
+        <div class="metric"><small>Plan mensual</small><strong>45 lotes</strong></div>
+        <div class="metric"><small>Fabricados</small><strong>31 lotes</strong><div class="progress"><i style="width:69%"></i></div><div class="subtle">Deberíamos llevar 35 · previsión 43/45</div></div>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="card"><h2>Alertas prioritarias</h2><div class="alert r">Producto 3: cobertura insuficiente para pedidos.</div><div class="alert a">R-04: OT abierta con posible impacto mañana.</div><div class="alert a">Producto 5: lote pendiente de revisión analítica.</div></div>
+      <div class="card"><h2>Próximos hitos</h2><div class="list"><div class="item"><span>10:00 · revisión OT R-04</span><b class="a">Hoy</b></div><div class="item"><span>12:30 · liberación PF05-260901</span><b class="b">Hoy</b></div><div class="item"><span>08:00 · preventivo C-02</span><b class="a">Mañana</b></div></div></div>
+      <div class="card"><h2>Resumen ejecutivo</h2><p style="line-height:1.65;margin:0">La situación global es estable, con dos focos: <strong>Producto 3</strong> por cobertura y <strong>Reactor R-04</strong> por mantenimiento. El resto del plan está controlado.</p></div>
+    </div>
+  </section>
+
+  <section id="produccion" class="page">
+    <div class="grid2"><div class="card scroll"><h2>Plan del día</h2><table><thead><tr><th>Área</th><th>Producto</th><th>Plan</th><th>Real</th><th>Estado</th></tr></thead><tbody>
+      <tr><td>Planta A</td><td>Producto 1</td><td>2</td><td>2</td><td><span class="badge g">OK</span></td></tr>
+      <tr><td>Planta A</td><td>Producto 2</td><td>2</td><td>1</td><td><span class="badge a">Retraso</span></td></tr>
+      <tr><td>Planta B</td><td>Producto 3</td><td>2</td><td>1</td><td><span class="badge r">Riesgo</span></td></tr>
+      <tr><td>Planta B</td><td>Producto 4</td><td>1</td><td>1</td><td><span class="badge g">OK</span></td></tr>
+      <tr><td>Planta C</td><td>Producto 5</td><td>1</td><td>1</td><td><span class="badge g">OK</span></td></tr>
+      <tr><td>Planta C</td><td>Producto 6</td><td>1</td><td>1</td><td><span class="badge g">OK</span></td></tr>
+    </tbody></table></div><div class="card"><h2>Lectura rápida</h2><div class="metric"><small>Lotes previstos</small><strong>9</strong></div><div class="metric"><small>Terminados</small><strong>7</strong></div><div class="metric"><small>Línea en riesgo</small><strong class="r">Planta B</strong></div></div></div>
+  </section>
+
+  <section id="stocks" class="page">
+    <div class="grid2"><div class="card scroll"><h2>Producto final</h2><table><thead><tr><th>Producto</th><th>Libre</th><th>En calidad</th><th>Pedidos</th><th>Saldo</th><th>Estado</th></tr></thead><tbody>
+      <tr><td>Producto 1</td><td>980 kg</td><td>320 kg</td><td>1.050 kg</td><td class="g">+250</td><td><span class="badge g">Cubierto</span></td></tr>
+      <tr><td>Producto 2</td><td>720 kg</td><td>250 kg</td><td>400 kg</td><td class="g">+320</td><td><span class="badge g">Cubierto</span></td></tr>
+      <tr><td>Producto 3</td><td>450 kg</td><td>700 kg</td><td>1.400 kg</td><td class="r">-950</td><td><span class="badge r">Riesgo</span></td></tr>
+      <tr><td>Producto 4</td><td>1.350 kg</td><td>0</td><td>750 kg</td><td class="g">+600</td><td><span class="badge g">Cubierto</span></td></tr>
+      <tr><td>Producto 5</td><td>300 kg</td><td>220 kg</td><td>420 kg</td><td class="r">-120</td><td><span class="badge a">Vigilar</span></td></tr>
+      <tr><td>Producto 6</td><td>1.600 kg</td><td>400 kg</td><td>1.000 kg</td><td class="g">+600</td><td><span class="badge g">Cubierto</span></td></tr>
+    </tbody></table></div><div class="card scroll"><h2>Intermedios / MP básicas</h2><table><thead><tr><th>Intermedio</th><th>Stock</th><th>kg/lote</th><th>Lotes posibles</th><th>Estado</th></tr></thead><tbody>
+      <tr><td>Intermedio 1</td><td>1.220</td><td>240</td><td>5,1</td><td><span class="badge g">OK</span></td></tr>
+      <tr><td>Intermedio 2</td><td>650</td><td>180</td><td>3,6</td><td><span class="badge a">Vigilar</span></td></tr>
+      <tr><td>Intermedio 3</td><td>410</td><td>275</td><td>1,5</td><td><span class="badge r">Riesgo</span></td></tr>
+      <tr><td>Intermedio 4</td><td>900</td><td>210</td><td>4,3</td><td><span class="badge g">OK</span></td></tr>
+      <tr><td>Intermedio 5</td><td>350</td><td>160</td><td>2,2</td><td><span class="badge a">Vigilar</span></td></tr>
+      <tr><td>Intermedio 6</td><td>1.380</td><td>300</td><td>4,6</td><td><span class="badge g">OK</span></td></tr>
+    </tbody></table></div></div>
+  </section>
+
+  <section id="mantenimiento" class="page">
+    <div class="grid2"><div class="card scroll"><h2>Órdenes de trabajo abiertas</h2><table><thead><tr><th>OT</th><th>Equipo</th><th>Tipo</th><th>Estado</th><th>Impacto</th><th>Fin previsto</th></tr></thead><tbody>
+      <tr><td>OT-24567</td><td>Reactor R-04</td><td>Correctivo</td><td>Abierta</td><td><span class="badge r">Sí</span></td><td>25/09 · 14:00</td></tr>
+      <tr><td>OT-24589</td><td>Centrífuga C-02</td><td>Preventivo</td><td>Planificada</td><td><span class="badge a">Parcial</span></td><td>25/09 · 12:00</td></tr>
+      <tr><td>OT-24591</td><td>Secador S-01</td><td>Preventivo</td><td>En curso</td><td><span class="badge g">No</span></td><td>24/09 · 18:00</td></tr>
+    </tbody></table></div><div class="card"><h2>Impacto en producción</h2><div class="alert r">R-04 afecta a Producto 3 y Producto 4 si la parada se prolonga.</div><div class="alert a">C-02 puede retrasar 1 lote de Producto 3 mañana.</div><div class="alert g">S-01 no afecta al plan vigente.</div></div></div>
+  </section>
+
+  <section id="calidad" class="page">
+    <div class="grid2"><div class="card scroll"><h2>Lotes y analítica</h2><table><thead><tr><th>Lote</th><th>Producto</th><th>Humedad</th><th>IR</th><th>Imp. G</th><th>Suma imp.</th><th>Estado</th></tr></thead><tbody>
+      <tr><td>PF03-260902</td><td>Producto 3</td><td>0,41</td><td>Cumple</td><td>Pendiente</td><td>Pendiente</td><td><span class="badge a">Pendiente</span></td></tr>
+      <tr><td>PF05-260902</td><td>Producto 5</td><td>0,58</td><td>Cumple</td><td>0,17</td><td>0,49</td><td><span class="badge a">Revisión</span></td></tr>
+      <tr><td>INT04-260902</td><td>Intermedio 4</td><td>0,33</td><td>Cumple</td><td>Pendiente</td><td>Pendiente</td><td><span class="badge a">Pendiente</span></td></tr>
+      <tr><td>PF01-260901</td><td>Producto 1</td><td>0,26</td><td>Cumple</td><td>0,08</td><td>0,19</td><td><span class="badge g">Liberable</span></td></tr>
+    </tbody></table></div><div class="card"><h2>Indicadores QC</h2><div class="metric"><small>Lotes pendientes</small><strong class="a">3</strong></div><div class="metric"><small>Lotes liberables</small><strong class="g">9</strong></div><div class="metric"><small>Incidencias analíticas</small><strong class="r">1</strong></div></div></div>
+  </section>
+
+  <section id="personal" class="page">
+    <div class="grid2"><div class="card scroll"><h2>Cobertura por turno</h2><table><thead><tr><th>Turno</th><th>Área</th><th>Necesarios</th><th>Disponibles</th><th>Cualificados</th><th>Cobertura</th></tr></thead><tbody>
+      <tr><td>Mañana</td><td>Planta A</td><td>8</td><td>8</td><td>8</td><td><span class="badge g">100%</span></td></tr>
+      <tr><td>Mañana</td><td>Planta B</td><td>7</td><td>6</td><td>6</td><td><span class="badge r">86%</span></td></tr>
+      <tr><td>Mañana</td><td>Planta C</td><td>6</td><td>7</td><td>6</td><td><span class="badge g">117%</span></td></tr>
+      <tr><td>Tarde</td><td>Planta A</td><td>8</td><td>8</td><td>8</td><td><span class="badge g">100%</span></td></tr>
+      <tr><td>Tarde</td><td>Planta B</td><td>7</td><td>7</td><td>7</td><td><span class="badge g">100%</span></td></tr>
+    </tbody></table></div><div class="card"><h2>Comentario</h2><div class="alert a">La falta de 1 persona en Planta B coincide con el foco de Producto 3 y aumenta el riesgo operativo del turno.</div></div></div>
+  </section>
+
+  <section id="incidencias" class="page">
+    <div class="grid2"><div class="card scroll"><h2>Últimas 24 h</h2><table><thead><tr><th>Hora</th><th>Categoría</th><th>Área</th><th>Descripción</th><th>Impacto</th><th>Estado</th></tr></thead><tbody>
+      <tr><td>05:40</td><td>Calidad</td><td>Planta B</td><td>Desviación menor en muestreo</td><td>No</td><td><span class="badge a">Investigación</span></td></tr>
+      <tr><td>06:15</td><td>Seguridad</td><td>Planta A</td><td>Derrame menor contenido y limpiado</td><td>No</td><td><span class="badge g">Cerrada</span></td></tr>
+      <tr><td>06:50</td><td>Medio ambiente</td><td>Servicios</td><td>Alarma puntual en lectura de vertido</td><td>No</td><td><span class="badge a">Seguimiento</span></td></tr>
+    </tbody></table></div><div class="card"><h2>Resumen</h2><div class="metric"><small>Seguridad</small><strong>1 menor</strong></div><div class="metric"><small>Medio ambiente</small><strong>1 seguimiento</strong></div><div class="metric"><small>Calidad</small><strong>1 desviación</strong></div></div></div>
+  </section>
+
+  <div class="footer">Prototipo visual con datos ficticios. No contiene información real de fabricación.</div>
+</main>
+</div>
+<script>
+const info={
+ general:["Visión general","¿Vamos a cumplir el plan y los pedidos?"],
+ produccion:["Producción","Plan, lotes fabricados y posibles retrasos."],
+ stocks:["Stocks y cobertura","Producto final, intermedios y pedidos firmes."],
+ mantenimiento:["Mantenimiento","OT abiertas, fechas y efecto sobre la capacidad."],
+ calidad:["Calidad y laboratorio","Analítica, lotes pendientes y liberación."],
+ personal:["Personal","Cobertura de puestos y cualificación."],
+ incidencias:["Incidencias","Seguridad, medio ambiente y calidad en 24 h."]
+};
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{
+ document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+ b.classList.add("active"); document.getElementById(b.dataset.page).classList.add("active");
+ document.getElementById("title").textContent=info[b.dataset.page][0];
+ document.getElementById("subtitle").textContent=info[b.dataset.page][1];
+ window.scrollTo({top:0,behavior:"smooth"});
+});
+</script>
+</body>
+</html>
