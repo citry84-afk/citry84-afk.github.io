@@ -3,46 +3,46 @@
   if(!D) return;
 
   Object.assign(D.meta,{
-    updated:'09/10/2026',
-    week:41,
-    status:'Fondos disponibles 14,1% · por debajo del mínimo 20%; ORCL sigue concentrando el riesgo',
+    updated:'16/10/2026',
+    week:42,
+    status:'Fondos disponibles 16,7% · por debajo del mínimo 20%; ORCL sigue concentrando el riesgo',
     statusLevel:'red'
   });
 
   Object.assign(D.current,{
-    liquiditySnapshotDate:'09/10/2026 (captura IBKR; PDF cierre 08/10)',
-    liquidityPortfolio:64074.38,
-    portfolio:64074.38,
-    pdfNav:64339.88,
-    pdfDate:'08/10/2026',
+    liquiditySnapshotDate:'16/10/2026 (captura IBKR; PDF cierre 15/10)',
+    liquidityPortfolio:61914.46,
+    portfolio:61914.46,
+    pdfNav:62397.02,
+    pdfDate:'15/10/2026',
     contributed:54975.00,
-    yearProfit:9099.38,
-    ytdManualPct:16.55185,
-    ibkrTwrPct:8.56,
-    optionsGrossYtd:25247.88,
+    yearProfit:6939.46,
+    ytdManualPct:12.62294,
+    ibkrTwrPct:5.28,
+    optionsGrossYtd:25844.56,
     assignmentRealizedTotal:-11884.28,
     assignmentDividendsGross:1036.36,
     closedAssignmentAdjustments:-10847.92,
-    optionsYtd:14400.00,
-    optionsPrudent:-2692.70,
-    optionsWeekly:346.67,
-    optionsAvgWeekly:351.33,
-    optionsMonthlyAvg:1405.33,
-    optionsAnnualProjection:18269.33,
-    fundsAvailable:11725.19,
-    excessLiquidity:16854.67,
-    cash:-113020.82,
-    buyingPower:78167.91,
-    grossSecurities:214830.14,
-    mtdInterest:-123.48,
+    optionsYtd:14996.64,
+    optionsPrudent:-7091.42,
+    optionsWeekly:596.64,
+    optionsAvgWeekly:357.06,
+    optionsMonthlyAvg:1547.27,
+    optionsAnnualProjection:18567.27,
+    fundsAvailable:10359.43,
+    excessLiquidity:14862.92,
+    cash:-111462.41,
+    buyingPower:69062.88,
+    grossSecurities:212585.47,
+    mtdInterest:-247.99,
     unrealizedPnl:-8590.48,
     realizedPnl:135.82,
     orclShares:1096,
-    orclPrice:138.99,
+    orclPrice:134.47,
     orclMarketValueEur:135505.93,
-    orclUnrealized:-16741.69,
+    orclUnrealized:-22088.06,
     orclRealized:-3637.46,
-    orclMtmTotal:-20379.15,
+    orclMtmTotal:-25725.52,
     nvoShares:0,
     nvoPrice:37.43,
     nvoMarketValueEur:0,
@@ -50,7 +50,7 @@
     nvoRealized:-2691.73,
     nvoPnlApprox:-2691.73,
     assignmentMarketValueEur:135605.82,
-    assignmentUnrealized:-16746.03
+    assignmentUnrealized:-22088.06
   });
 
   const august=D.monthlyOptions.find(x=>x.month==='Agosto');
@@ -62,11 +62,11 @@
   else D.monthlyOptions.push({month:'Septiembre',value:3480.38});
 
   const october=D.monthlyOptions.find(x=>x.month==='Octubre');
-  if(october) october.value=482.59;
+  if(october) october.value=1079.23;
   else D.monthlyOptions.push({month:'Octubre',value:135.92});
 
   const y2026=D.annualOptions.find(x=>String(x.year).startsWith('2026'));
-  if(y2026) y2026.value=14400.00;
+  if(y2026) y2026.value=14996.64;
 
   const week32={week:32,date:'2026-08-07',ytdPct:16.1315,saldo:63262.61,aportado:54475,euroYear:8787.61,optionsYtd:8461.19,weeklyOptions:307.11,source:'Pantallazo 07/08 + PDF 06/08'};
   const idx32=D.weekly2026.findIndex(x=>x.week===32);
@@ -116,6 +116,8 @@
   const week41={week:41,date:'2026-10-09',ytdPct:16.55185,saldo:64074.38,aportado:54975,euroYear:9099.38,optionsYtd:14400,weeklyOptions:346.67,source:'IBKR captura 09/10 + PDF 08/10'};
   const idx41=D.weekly2026.findIndex(x=>x.week===41);
   if(idx41>=0) D.weekly2026[idx41]=week41; else D.weekly2026.push(week41);
+  const w42={week:42,date:'2026-10-16',ytdPct:12.62294,saldo:61914.46,aportado:54975,euroYear:6939.46,optionsYtd:14996.64,weeklyOptions:596.64,source:'Captura IBKR 16/10 + PDF 15/10'};
+  const i42=D.weekly2026.findIndex(x=>x.week===42);if(i42>=0)D.weekly2026[i42]=w42;else D.weekly2026.push(w42);
   D.weekly2026.sort((a,b)=>a.week-b.week);
 
   if(!D.weeklyOptionsAll['2026']) D.weeklyOptionsAll['2026']=[];
@@ -129,10 +131,11 @@
   D.weeklyOptionsAll['2026'][38]=1553.63;
   D.weeklyOptionsAll['2026'][39]=332.74;
   D.weeklyOptionsAll['2026'][40]=346.67;
+  D.weeklyOptionsAll['2026'][41]=596.64;
 
   setTimeout(()=>{
     const footer=document.querySelector('.footer-note');
-    if(footer) footer.textContent='PDF IBKR YTD cerrado al 01/10/2026; valor de cartera y fondos disponibles obtenidos directamente de IBKR el 02/10/2026. La rentabilidad principal se calcula frente al capital neto aportado de 54.975 €. La semana 29 conserva el NAV del PDF porque no se dispone del pantallazo.';
+    if(footer) footer.textContent='PDF IBKR YTD cerrado al 15/10/2026; valor de cartera y fondos disponibles según captura del 16/10/2026. La rentabilidad principal se calcula frente al capital neto aportado de 54.975 €. La semana 29 conserva el NAV del PDF porque no se dispone del pantallazo.';
 
     const quality=document.getElementById('optionsQuality');
     if(quality){
