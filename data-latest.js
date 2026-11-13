@@ -3,54 +3,54 @@
   if(!D) return;
 
   Object.assign(D.meta,{
-    updated:'06/11/2026',
-    week:45,
-    status:'Alerta margen: fondos disponibles 5,15%; riesgo ORCL y GOOG',
-    statusLevel:'red'
+    updated:'13/11/2026',
+    week:46,
+    status:'Fondos disponibles 18,73% (inferior al 20%); riesgo concentrado en ORCL y opciones GOOG',
+    statusLevel:'amber'
   });
 
   Object.assign(D.current,{
-    liquiditySnapshotDate:'06/11/2026 (IBKR directo; PDF cierre 05/11)',
-    liquidityPortfolio:39993.11,
-    portfolio:39993.11,
-    pdfNav:40410.54,
-    pdfDate:'05/11/2026',
-    contributed:54975.00,
-    yearProfit:-14981.89,
-    ytdManualPct:-27.25219,
-    ibkrTwrPct:-31.81,
+    liquiditySnapshotDate:'13/11/2026 (captura IBKR; PDF cierre 12/11)',
+    liquidityPortfolio:53595.97,
+    portfolio:53595.97,
+    pdfNav:52391.58,
+    pdfDate:'12/11/2026',
+    contributed:54975,
+    yearProfit:-1379.03,
+    ytdManualPct:-2.50847,
+    ibkrTwrPct:-11.6,
     optionsGrossYtd:26430.72,
     assignmentRealizedTotal:-11884.28,
     assignmentDividendsGross:1510.49,
     closedAssignmentAdjustments:-10373.79,
     optionsYtd:16056.93,
-    optionsPrudent:-22737.45,
-    optionsWeekly:-142.13,
-    optionsAvgWeekly:365.70,
-    optionsMonthlyAvg:1584.72,
-    optionsAnnualProjection:19015.95,
-    fundsAvailable:2058.44,
-    excessLiquidity:5568.34,
-    cash:-104300.22,
-    buyingPower:13722.94,
-    grossSecurities:182873.98,
-    mtdInterest:-52.36,
-    unrealizedPnl:-8590.48,
+    optionsPrudent:-12744.98,
+    optionsWeekly:0,
+    optionsAvgWeekly:349.06,
+    optionsMonthlyAvg:1512.58,
+    optionsAnnualProjection:18149.14,
+    fundsAvailable:10039.58,
+    excessLiquidity:15887.35,
+    cash:-105292.43,
+    buyingPower:66930.51,
+    grossSecurities:197407.53,
+    mtdInterest:-171.87,
+    unrealizedPnl:0,
     realizedPnl:135.82,
     orclShares:1096,
-    orclPrice:116.55,
-    orclMarketValueEur:114130.88,
-    orclUnrealized:-38794.38,
+    orclPrice:127.11,
+    orclMarketValueEur:126015.18,
+    orclUnrealized:-28801.91,
     orclRealized:-3637.46,
-    orclMtmTotal:-42431.84,
+    orclMtmTotal:-32439.37,
     nvoShares:0,
     nvoPrice:37.43,
     nvoMarketValueEur:0,
     nvoUnrealized:0,
     nvoRealized:-2691.73,
     nvoPnlApprox:-2691.73,
-    assignmentMarketValueEur:114130.88,
-    assignmentUnrealized:-38794.38
+    assignmentMarketValueEur:126015.18,
+    assignmentUnrealized:-28801.91
   });
 
   const august=D.monthlyOptions.find(x=>x.month==='Agosto');
@@ -124,6 +124,8 @@
   const i44=D.weekly2026.findIndex(x=>x.week===44);if(i44>=0)D.weekly2026[i44]=w44;else D.weekly2026.push(w44);
   const w45={week:45,date:'2026-11-06',ytdPct:-27.25219,saldo:39993.11,aportado:54975,euroYear:-14981.89,optionsYtd:16056.93,weeklyOptions:-142.13,source:'IBKR 06/11 + PDF 05/11'};
   const i45=D.weekly2026.findIndex(x=>x.week===45);if(i45>=0)D.weekly2026[i45]=w45;else D.weekly2026.push(w45);
+  const w46={week:46,date:'2026-11-13',ytdPct:-2.50847,saldo:53595.97,aportado:54975,euroYear:-1379.03,optionsYtd:16056.93,weeklyOptions:0,source:'Captura IBKR 13/11 + PDF 12/11'};
+  const i46=D.weekly2026.findIndex(x=>x.week===46);if(i46>=0)D.weekly2026[i46]=w46;else D.weekly2026.push(w46);
   D.weekly2026.sort((a,b)=>a.week-b.week);
 
   if(!D.weeklyOptionsAll['2026']) D.weeklyOptionsAll['2026']=[];
@@ -141,10 +143,11 @@
   D.weeklyOptionsAll['2026'][42]=728.29;
   D.weeklyOptionsAll['2026'][43]=474.13;
   D.weeklyOptionsAll['2026'][44]=-142.13;
+  D.weeklyOptionsAll['2026'][45]=0;
 
   setTimeout(()=>{
     const footer=document.querySelector('.footer-note');
-    if(footer) footer.textContent='PDF IBKR YTD cerrado al 29/10/2026; valor de cartera y fondos disponibles según captura del 30/10/2026. La rentabilidad principal se calcula frente al capital neto aportado de 54.975 €. La semana 29 conserva el NAV del PDF porque no se dispone del pantallazo.';
+    if(footer) footer.textContent='PDF IBKR YTD cerrado al 12/11/2026; valor de cartera y fondos disponibles según captura del 13/11/2026. La rentabilidad principal se calcula frente al capital neto aportado de 54.975 €. La semana 29 conserva el NAV del PDF porque no se dispone del pantallazo.';
 
     const quality=document.getElementById('optionsQuality');
     if(quality){
