@@ -3,54 +3,54 @@
   if(!D) return;
 
   Object.assign(D.meta,{
-    updated:'13/11/2026',
-    week:46,
-    status:'Fondos disponibles 18,73% (inferior al 20%); riesgo concentrado en ORCL y opciones GOOG',
-    statusLevel:'amber'
+    updated:'20/11/2026',
+    week:47,
+    status:'ALERTA CRÍTICA DE MARGEN: exceso de liquidez -192 € y fondos disponibles -4.843,81 €; posible liquidación forzosa',
+    statusLevel:'red'
   });
 
   Object.assign(D.current,{
-    liquiditySnapshotDate:'13/11/2026 (captura IBKR; PDF cierre 12/11)',
-    liquidityPortfolio:53595.97,
-    portfolio:53595.97,
-    pdfNav:52391.58,
-    pdfDate:'12/11/2026',
+    liquiditySnapshotDate:'20/11/2026 (IBKR directo; PDF cierre 19/11)',
+    liquidityPortfolio:32617.75,
+    portfolio:32617.75,
+    pdfNav:34650.77,
+    pdfDate:'19/11/2026',
     contributed:54975,
-    yearProfit:-1379.03,
-    ytdManualPct:-2.50847,
-    ibkrTwrPct:-11.6,
-    optionsGrossYtd:26430.72,
+    yearProfit:-22357.25,
+    ytdManualPct:-40.66803,
+    ibkrTwrPct:-41.53,
+    optionsGrossYtd:26579.97,
     assignmentRealizedTotal:-11884.28,
     assignmentDividendsGross:1510.49,
     closedAssignmentAdjustments:-10373.79,
-    optionsYtd:16056.93,
-    optionsPrudent:-12744.98,
-    optionsWeekly:0,
-    optionsAvgWeekly:349.06,
-    optionsMonthlyAvg:1512.58,
-    optionsAnnualProjection:18149.14,
-    fundsAvailable:10039.58,
-    excessLiquidity:15887.35,
-    cash:-105292.43,
-    buyingPower:66930.51,
-    grossSecurities:197407.53,
-    mtdInterest:-171.87,
+    optionsYtd:16206.18,
+    optionsPrudent:-29357.55,
+    optionsWeekly:149.25,
+    optionsAvgWeekly:344.81,
+    optionsMonthlyAvg:1494.21,
+    optionsAnnualProjection:17930.24,
+    fundsAvailable:-4843.81,
+    excessLiquidity:-192,
+    cash:-106315.61,
+    buyingPower:0,
+    grossSecurities:179960.94,
+    mtdInterest:-2163.78,
     unrealizedPnl:0,
     realizedPnl:135.82,
     orclShares:1096,
-    orclPrice:127.11,
-    orclMarketValueEur:126015.18,
-    orclUnrealized:-28801.91,
+    orclPrice:110.57,
+    orclMarketValueEur:121184.72,
+    orclUnrealized:-45563.73,
     orclRealized:-3637.46,
-    orclMtmTotal:-32439.37,
+    orclMtmTotal:-49201.19,
     nvoShares:0,
     nvoPrice:37.43,
     nvoMarketValueEur:0,
     nvoUnrealized:0,
     nvoRealized:-2691.73,
     nvoPnlApprox:-2691.73,
-    assignmentMarketValueEur:126015.18,
-    assignmentUnrealized:-28801.91
+    assignmentMarketValueEur:121184.72,
+    assignmentUnrealized:-45563.73
   });
 
   const august=D.monthlyOptions.find(x=>x.month==='Agosto');
@@ -126,6 +126,8 @@
   const i45=D.weekly2026.findIndex(x=>x.week===45);if(i45>=0)D.weekly2026[i45]=w45;else D.weekly2026.push(w45);
   const w46={week:46,date:'2026-11-13',ytdPct:-2.50847,saldo:53595.97,aportado:54975,euroYear:-1379.03,optionsYtd:16056.93,weeklyOptions:0,source:'Captura IBKR 13/11 + PDF 12/11'};
   const i46=D.weekly2026.findIndex(x=>x.week===46);if(i46>=0)D.weekly2026[i46]=w46;else D.weekly2026.push(w46);
+  const w47={week:47,date:'2026-11-20',ytdPct:-40.66803,saldo:32617.75,aportado:54975,euroYear:-22357.25,optionsYtd:16206.18,weeklyOptions:149.25,source:'IBKR directo 20/11 + PDF 19/11'};
+  const i47=D.weekly2026.findIndex(x=>x.week===47);if(i47>=0)D.weekly2026[i47]=w47;else D.weekly2026.push(w47);
   D.weekly2026.sort((a,b)=>a.week-b.week);
 
   if(!D.weeklyOptionsAll['2026']) D.weeklyOptionsAll['2026']=[];
@@ -144,10 +146,11 @@
   D.weeklyOptionsAll['2026'][43]=474.13;
   D.weeklyOptionsAll['2026'][44]=-142.13;
   D.weeklyOptionsAll['2026'][45]=0;
+  D.weeklyOptionsAll['2026'][46]=149.25;
 
   setTimeout(()=>{
     const footer=document.querySelector('.footer-note');
-    if(footer) footer.textContent='PDF IBKR YTD cerrado al 12/11/2026; valor de cartera y fondos disponibles según captura del 13/11/2026. La rentabilidad principal se calcula frente al capital neto aportado de 54.975 €. La semana 29 conserva el NAV del PDF porque no se dispone del pantallazo.';
+    if(footer) footer.textContent='PDF IBKR YTD cerrado al 19/11/2026; valor de cartera y margen según consulta directa IBKR del 20/11/2026. Riesgo de liquidación por margen negativo. La rentabilidad principal se calcula frente al capital neto aportado de 54.975 €. La semana 29 conserva el NAV del PDF porque no se dispone del pantallazo.';
 
     const quality=document.getElementById('optionsQuality');
     if(quality){
